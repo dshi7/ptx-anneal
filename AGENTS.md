@@ -80,7 +80,10 @@ PTX in, ACF out
   own interpreter); `compileiq_adapter.py` is the bundled default.
 - `ptx_anneal/provision.py` / `cli.py` — toolchain detection (`ptx-anneal doctor`)
   and the CLI. Tuning is the *default* action (`--task`); `doctor` and the internal
-  `_score`, plus `replay`, are the subcommands — there is no `tune` subcommand.
+  `_score`, plus `replay` and `register_spill`, are the subcommands — there is no `tune` subcommand.
+  `register_spill --task <file.ptx>` compiles without launching and minimizes spill-store + spill-load
+  bytes reported by `ptxas -v`. It uses the same adapter with `PTX_ANNEAL_METRIC=spill_bytes` and saves
+  improvements under a separate `register_spill/` store by default; these have no runtime validation.
 - `ptx_anneal/replay.py` — standalone `replay --task`: assemble and benchmark PTX without an
   engine or ACF. Uses lazy torch allocation and Triton TMA encoding with the CUDA driver;
   supports BF16, strides and CTA clusters. Inputs are synthetic; this is not a correctness check.
@@ -129,7 +132,8 @@ adapter — not the harness — must report its own identity.
 There are two orchestration paths; they share the torch-based PTX scorer where applicable:
 
 1. **`ptx_anneal --task` (the CLI, what ships).** Tuning is the default action —
-   there is no `tune` subcommand (`replay` benchmarks without tuning; `doctor` and `_score` also exist).
+   there is no `tune` subcommand (`replay` benchmarks without tuning; `register_spill` tunes compiler
+   spill statistics from a PTX file; `doctor` and `_score` also exist).
    `cli._cmd_tune` scores the baseline via `scoring.score`, spawns the engine adapter as a
    subprocess, and admits through `LocalStore`. The `_score` callback uses the same dispatch:
    `cudapy_worker` for ordinary contiguous tasks, `PtxTarget.score_one` for BF16/TMA/strides.

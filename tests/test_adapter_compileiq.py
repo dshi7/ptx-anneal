@@ -10,9 +10,12 @@ never needs the real engine (which is >=3.11,<3.14 + glibc 2.34) to cover this l
 
 import hashlib
 import importlib.util
+import json
 import shutil
+import subprocess
 import sys
 import types
+from pathlib import Path
 
 import pytest
 
@@ -250,3 +253,80 @@ def test_adapter_never_imports_ptx_anneal():
     with open(src) as f:
         body = f.read()
     assert "import ptx_anneal" not in body and "from ptx_anneal" not in body
+
+
+@pytest.mark.parametrize("metric", ["ms", "spill_bytes"])
+def test_search_metric_protocol_and_zero_winner(fake_compileiq, monkeypatch, tmp_path, metric):
+    """Exercise Search's objective callback, including failed/malformed scorers and zero scores."""
+    adapter = _load_adapter()
+    result_path = tmp_path / "result.json"
+    for name, value in {
+        "PTX_ANNEAL_SCORE_CMD": json.dumps(["scorer"]),
+        "PTX_ANNEAL_TASK": "/task.ptx",
+        "PTX_ANNEAL_PTXAS": "/ptxas",
+        "PTX_ANNEAL_RESULT": str(result_path),
+        "CIQ_TASK_TIMEOUT": "20",
+        "CIQ_POOL": "10",
+        "CIQ_GENERATIONS": "1",
+    }.items():
+        monkeypatch.setenv(name, value)
+    monkeypatch.delenv("PTX_ANNEAL_SS", raising=False)
+    if metric == "spill_bytes":
+        monkeypatch.setenv("PTX_ANNEAL_METRIC", metric)
+        # A clock pin from a benchmarking session must not make compile-only tuning require a GPU.
+        monkeypatch.setenv("CIQ_CLOCK_MHZ", "1965")
+    else:
+        monkeypatch.delenv("PTX_ANNEAL_METRIC", raising=False)  # existing adapter clients default to ms
+        monkeypatch.delenv("CIQ_CLOCK_MHZ", raising=False)
+    monkeypatch.setattr(adapter, "_ptxas_version", lambda p: "13.3")
+    replies = iter(["0", "3", "1.5", "INVALID", "abc", "nan", "inf", "-1", "exit", "timeout"])
+    scores = []
+
+    def run(cmd, **kwargs):
+        assert cmd[:3] == ["scorer", "--task", "/task.ptx"]
+        assert cmd[cmd.index("--ptxas") + 1] == "/ptxas"
+        assert Path(cmd[cmd.index("--acf") + 1]).is_file()
+        assert ("--warmup" in cmd) == (metric == "ms")
+        assert kwargs["timeout"] == 20
+        value = next(replies)
+        if value == "timeout":
+            raise subprocess.TimeoutExpired(cmd, 20)
+        if value == "exit":
+            return subprocess.CompletedProcess(cmd, 1, f"{metric.upper()} 0\n", "failed")
+        return subprocess.CompletedProcess(cmd, 0, f"{metric.upper()} {value}\n", "")
+
+    class Search:
+        def __init__(self, objective_function, search_space, search_config, exit_on_failure):
+            self.objective = objective_function
+            assert search_config.problem_type == "min"
+            assert exit_on_failure is False
+
+        def start(self, **kwargs):
+            assert kwargs == {"task_timeout": 25}
+            for index in range(10):
+                scores.append(self.objective(f"{index:02x}"))
+            return types.SimpleNamespace(
+                get_results=lambda: scores,
+                get_best_result=lambda: {"score_1": 0, "params": "00"},
+            )
+
+    ciq_types = types.ModuleType("compileiq.types")
+    ciq_types.INVALID_SCORE = float("inf")
+    ciq_types.SearchConfiguration = types.SimpleNamespace
+    monkeypatch.setitem(sys.modules, "compileiq.types", ciq_types)
+    monkeypatch.setattr(sys.modules["compileiq.ciq"], "Search", Search)
+    monkeypatch.setattr(adapter.subprocess, "run", run)
+
+    assert adapter.main() == 0
+    result = json.loads(result_path.read_text())
+    assert result[f"best_{metric}"] == 0 and result["acf"] == "00"
+    assert result["valid"] == (3 if metric == "ms" else 2)
+    assert result["evaluated"] == 10 and result["timeout"] == 1
+    assert scores[:2] == [0, 3]
+    assert all(score == float("inf") for score in scores[3:])
+    assert result["budget"]["clock_mhz"] is None
+    assert result["search_space"]["sha256"] == "deadbeef"
+    assert result["engine_info"]["name"] == "compileiq"
+    if metric == "spill_bytes":
+        assert "best_ms" not in result
+        assert result["budget"]["warmup"] is None and result["budget"]["rep"] is None

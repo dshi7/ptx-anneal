@@ -396,6 +396,25 @@ def build_spec_from_schema(schema: dict, ptx: str, grid, ordered_args, ptxas: st
 def ptxas_compile(ptx: str, ptxas: str, arch: str | None = None, acf_path: str | None = None, extra_args=()) -> bytes:
     """Assemble PTX -> cubin with ptxas. If acf_path is given, append --apply-controls=<acf>
     (the consume mechanism). Raises RuntimeError with ptxas stderr on failure."""
+    cubin, _ = _ptxas_compile(ptx, ptxas, arch, acf_path, extra_args)
+    return cubin
+
+
+def ptxas_spill_bytes(ptx: str, ptxas: str, arch: str | None = None, acf_path: str | None = None) -> int:
+    """Sum ptxas's static spill-store and spill-load bytes across all reported functions.
+
+    This only assembles the PTX; it never loads or launches the cubin. Missing diagnostics are
+    invalid, not zero spilling. Stack-frame size and register count are not spill statistics.
+    """
+    _, diagnostics = _ptxas_compile(ptx, ptxas, arch, acf_path, ("-v",))
+    spills = re.findall(r"(\d+) bytes spill stores,\s*(\d+) bytes spill loads", diagnostics)
+    if not spills:
+        raise RuntimeError(f"ptxas did not report spill statistics:\n{diagnostics.strip()}")
+    return sum(int(stores) + int(loads) for stores, loads in spills)
+
+
+def _ptxas_compile(ptx: str, ptxas: str, arch: str | None, acf_path: str | None, extra_args) -> tuple[bytes, str]:
+    """Shared assembler invocation, retaining diagnostics for compile-only objectives."""
     arch = arch or parse_arch(ptx)
     with (
         tempfile.NamedTemporaryFile("w", suffix=".ptx", delete=True) as pf,
@@ -410,7 +429,7 @@ def ptxas_compile(ptx: str, ptxas: str, arch: str | None = None, acf_path: str |
         if r.returncode != 0:
             raise RuntimeError(f"ptxas failed (rc={r.returncode}): {r.stderr.strip()}\n  cmd: {' '.join(cmd)}")
         with open(cf.name, "rb") as f:
-            return f.read()
+            return f.read(), r.stdout + "\n" + r.stderr
 
 
 # --------------------------------------------------------------------------------------
