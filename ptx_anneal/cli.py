@@ -5,6 +5,7 @@
 
     ptx_anneal --task <task_dir> [--output <store>] [--ss <ss>]
     ptx_anneal replay --task <task_dir>
+    ptx_anneal register_spill --task <kernel.ptx> [--output <store>]
     ptx_anneal doctor
 
 Per-run surface is just the task; the engine, its search space and ptxas are all provisioning, and
@@ -40,6 +41,7 @@ import tempfile
 from . import fingerprint as fp_mod
 from . import provision
 from . import task as task_mod
+from .ptx_launch import DEFAULT_PTXAS_FLAGS
 from .store import LocalStore, default_store_root
 from .target import load_target
 
@@ -77,7 +79,7 @@ def _fingerprint(args, t, ptxas: str, ver: str | None, res: dict) -> dict:
         # produced it did its work at COLLECT time and is not an input here. Recorded as empty rather
         # than omitted, so a diff against the triton-native channel shows the difference explicitly.
         frontend={},
-        ptxas={"path": ptxas, "version": ver, "flags": fp_mod.ptxas_flags()},
+        ptxas={"path": ptxas, "version": ver, "flags": [*DEFAULT_PTXAS_FLAGS, *fp_mod.ptxas_flags()]},
         search_space=res.get("search_space") or {},
         engine={**(res.get("engine_info") or {}), "budget": res.get("budget") or {}},
         objective={
@@ -125,16 +127,26 @@ def _bundled_adapter() -> str:
 def _cmd_score(args) -> int:
     if args.ptxas:
         os.environ["TRITON_PTXAS_BLACKWELL_PATH"] = args.ptxas
-    from . import scoring
-
     acf = None if args.acf in (None, "NONE") else args.acf
     try:
-        ms = scoring.score(args.task, acf, args.warmup, args.rep, args.bench, ptxas=_resolve_ptxas(args))
-        print(f"MS {float(ms)}")
+        if args.metric == "spill_bytes":
+            print(f"SPILL_BYTES {_score_spills(args.task, acf, _resolve_ptxas(args))}")
+        else:
+            from . import scoring
+
+            ms = scoring.score(args.task, acf, args.warmup, args.rep, args.bench, ptxas=_resolve_ptxas(args))
+            print(f"MS {float(ms)}")
     except Exception as e:  # noqa: BLE001 - any failure is INVALID to the caller
         sys.stderr.write(f"[_score] {type(e).__name__}: {e}\n")
         print("INVALID")
     return 0
+
+
+def _score_spills(task: str, acf: str | None, ptxas: str) -> int:
+    from .ptx_launch import ptxas_spill_bytes
+
+    with open(task) as f:
+        return ptxas_spill_bytes(f.read(), ptxas, acf_path=acf)
 
 
 def _score_one(
@@ -185,17 +197,47 @@ def _cmd_replay(args) -> int:
         return 1
 
 
-# -- tune: baseline -> spawn engine adapter -> admit ----------------------------------------------
-def _cmd_tune(args) -> int:
-    # --task is enforced by the parser (build_parser), so no check here.
-    ptxas, ver = _require_ptxas(args)
+def _engine_command(args) -> tuple[str, str]:
     # Override only when the engine lives in a separate interpreter.
     engine_python = args.engine_python or os.environ.get("PTX_ANNEAL_ENGINE_PYTHON") or sys.executable
     # The engine stays bring-your-own: the bundled CompileIQ adapter is only the default.
     adapter = args.engine_adapter or os.environ.get("PTX_ANNEAL_ENGINE_ADAPTER") or _bundled_adapter()
     if not os.path.exists(adapter):
         raise SystemExit(f"ptx_anneal: engine adapter not found: {adapter!r}")
+    return engine_python, adapter
 
+
+def _run_engine(args, ptxas: str, engine_python: str, adapter: str, *, metric: str = "ms") -> dict:
+    """Drive the subprocess adapter with either runtime or assembly-only scoring."""
+    result_fd, result_path = tempfile.mkstemp(suffix=".json")
+    os.close(result_fd)
+    env = dict(os.environ)
+    score_args = ["--bench", args.bench] if metric == "ms" else ["--metric", metric]
+    env["PTX_ANNEAL_SCORE_CMD"] = json.dumps([*_harness_cmd(), "_score", *score_args])
+    env["PTX_ANNEAL_METRIC"] = metric
+    env["PTX_ANNEAL_TASK"] = os.path.abspath(args.task)
+    env["PTX_ANNEAL_PTXAS"] = ptxas
+    env["PTX_ANNEAL_RESULT"] = result_path
+    env["PTX_ANNEAL_WARMUP"] = str(getattr(args, "warmup", 0))
+    env["PTX_ANNEAL_REP"] = str(getattr(args, "rep", 0))
+    if args.ss:
+        env["PTX_ANNEAL_SS"] = os.path.abspath(args.ss)
+    try:
+        proc = subprocess.run([engine_python, adapter], env=env, check=False)
+        if proc.returncode != 0:
+            raise SystemExit(f"ptx_anneal: engine adapter exited {proc.returncode}")
+        with open(result_path) as f:
+            return json.load(f)
+    finally:
+        if os.path.exists(result_path):
+            os.unlink(result_path)
+
+
+# -- tune: baseline -> spawn engine adapter -> admit ----------------------------------------------
+def _cmd_tune(args) -> int:
+    # --task is enforced by the parser (build_parser), so no check here.
+    ptxas, ver = _require_ptxas(args)
+    engine_python, adapter = _engine_command(args)
     t = task_mod.load(args.task)
     target = load_target(args.target)
     arch, ir_hash = target.arch(t.ir), target.ir_hash(t.ir)
@@ -211,27 +253,7 @@ def _cmd_tune(args) -> int:
     print(f"baseline: {f'{baseline_ms:.4f} ms' if baseline_ok else 'FAILED'} (bench={args.bench})")
 
     # 2) run the engine in its own interpreter via the adapter; it scores candidates through `_score`.
-    result_fd, result_path = tempfile.mkstemp(suffix=".json")
-    os.close(result_fd)
-    env = dict(os.environ)
-    env["PTX_ANNEAL_SCORE_CMD"] = json.dumps([*_harness_cmd(), "_score", "--bench", args.bench])
-    env["PTX_ANNEAL_TASK"] = os.path.abspath(args.task)
-    env["PTX_ANNEAL_PTXAS"] = ptxas
-    env["PTX_ANNEAL_RESULT"] = result_path
-    env["PTX_ANNEAL_WARMUP"] = str(args.warmup)
-    env["PTX_ANNEAL_REP"] = str(args.rep)
-    if args.ss:
-        env["PTX_ANNEAL_SS"] = os.path.abspath(args.ss)
-    try:
-        proc = subprocess.run([engine_python, adapter], env=env, check=False)
-        if proc.returncode != 0:
-            raise SystemExit(f"ptx_anneal: engine adapter exited {proc.returncode}")
-        with open(result_path) as f:
-            res = json.load(f)
-    finally:
-        if os.path.exists(result_path):
-            os.unlink(result_path)
-
+    res = _run_engine(args, ptxas, engine_python, adapter)
     evaluated = int(res.get("evaluated") or 0)
     valid = res.get("valid")
     # Surfaced, not logged: timed-out candidates are search scope that was dropped.
@@ -264,6 +286,7 @@ def _cmd_tune(args) -> int:
             "engine": engine_name,
             "valid": valid,
             "ptxas_version": ver,
+            "ptxas_flags": list(DEFAULT_PTXAS_FLAGS),
             # Which search space produced this ACF. The search space is a tuning *input*, and the
             # engine resolves it to "latest" by default, so recording it is what keeps an admitted
             # ACF explainable (and a pinned CIQ_SS_TAG meaningful) after the catalog moves on.
@@ -321,6 +344,60 @@ def _cmd_tune(args) -> int:
     return 0
 
 
+def _cmd_register_spill(args) -> int:
+    from .ptx_launch import ptxas_spill_bytes
+
+    try:
+        with open(args.task) as f:
+            ptx = f.read()
+        target = load_target("ptx")
+        arch, ir_hash = target.arch(ptx), target.ir_hash(ptx)
+        ptxas, ver = _require_ptxas(args)
+        engine_python, adapter = _engine_command(args)
+        print(
+            f"register_spill: task={args.task} ; arch={arch} ; ptxas={ptxas} (V{ver}) ; "
+            f"engine-python={engine_python} ; adapter={os.path.basename(adapter)}",
+            flush=True,
+        )
+        baseline = ptxas_spill_bytes(ptx, ptxas)
+        print(f"baseline: {baseline} spill bytes (stores + loads)", flush=True)
+        res = _run_engine(args, ptxas, engine_python, adapter, metric="spill_bytes")
+        if res.get("engine_error"):
+            raise RuntimeError(f"engine search failed: {res['engine_error']}")
+        best = res.get("best_spill_bytes")
+        acf_hex = res.get("acf")
+        valid = (
+            bool(acf_hex) and isinstance(best, (int, float)) and math.isfinite(best) and best >= 0 and best == int(best)
+        )
+        counts = f"evaluated={res.get('evaluated', 0)} valid={res.get('valid')} timeout={res.get('timeout', 0)}"
+        if valid and best < baseline:
+            # This objective has no runtime correctness or performance check. Its default store
+            # must not replace the validated runtime winner for the same PTX and toolchain.
+            root = args.output or os.path.join(default_store_root(), "register_spill")
+            meta = {
+                "objective": "spill_bytes",
+                "correctness": "not checked (compile-only)",
+                "baseline_spill_bytes": baseline,
+                "best_spill_bytes": int(best),
+                "evaluated": res.get("evaluated", 0),
+                "valid": res.get("valid"),
+                "ptxas_version": ver,
+                "ptxas_flags": [f"-arch={arch}", *DEFAULT_PTXAS_FLAGS, "-v"],
+                "search_space": res.get("search_space") or None,
+                "engine_info": res.get("engine_info") or None,
+                "budget": res.get("budget") or {},
+            }
+            path = LocalStore(root).write("ptx", arch, ir_hash, bytes.fromhex(acf_hex), meta, toolchain_version=ver)
+            print(f"admitted ACF (baseline={baseline} best={int(best)} spill bytes) {counts} -> {path}")
+        else:
+            reason = "no valid candidate" if not valid else "no candidate reduced spill bytes"
+            print(f"no candidate admitted ({reason}); {counts}")
+        return 0
+    except Exception as e:  # noqa: BLE001 - report compile/search/file failures without a traceback
+        sys.stderr.write(f"[register_spill] {type(e).__name__}: {e}\n")
+        return 1
+
+
 def _cmd_doctor() -> int:
     print(provision.format_report(provision.report()))
     return 0
@@ -332,6 +409,7 @@ def _cmd_doctor() -> int:
 _USAGE = (
     "ptx_anneal --task <dir> [--output <store>] [options]\n"
     "       ptx_anneal replay --task <dir> [options]\n"
+    "       ptx_anneal register_spill --task <kernel.ptx> [options]\n"
     "       ptx_anneal doctor"
 )
 
@@ -388,6 +466,11 @@ def build_parser() -> argparse.ArgumentParser:
     g.add_argument("--rep", type=int, default=50, help="benchmark measured iters (default: %(default)s)")
     g.add_argument("--target", default="ptx", help="target (default: %(default)s)")
 
+    _add_provisioning_pins(p)
+    return p
+
+
+def _add_provisioning_pins(p: argparse.ArgumentParser) -> None:
     g = p.add_argument_group("provisioning pins", "all optional -- each of these self-provisions")
     g.add_argument(
         "--ptxas",
@@ -404,6 +487,24 @@ def build_parser() -> argparse.ArgumentParser:
         dest="engine_adapter",
         help="bring-your-own engine adapter script (default: bundled CompileIQ / $PTX_ANNEAL_ENGINE_ADAPTER)",
     )
+
+
+def _register_spill_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(
+        prog="ptx_anneal register_spill",
+        description="Tune CompileIQ controls to minimize ptxas spill-store + spill-load bytes across all "
+        "functions in a PTX file. Compile-only: no GPU, launch spec, or runtime validation required.",
+        epilog="CIQ_POOL / CIQ_GENERATIONS set the search budget. Only candidates with fewer spill bytes "
+        "than the baseline are saved; zero spill bytes is a valid score.",
+    )
+    p.add_argument("--task", required=True, help="local PTX file (not a task directory)")
+    p.add_argument(
+        "--output",
+        "--store",
+        dest="output",
+        help="ACF store root (default: register_spill/ under the default ACF store)",
+    )
+    _add_provisioning_pins(p)
     return p
 
 
@@ -426,6 +527,7 @@ def _score_parser() -> argparse.ArgumentParser:
     p.add_argument("--task", required=True)
     p.add_argument("--acf", default="NONE", help="ACF file path, or NONE for the untuned baseline")
     p.add_argument("--ptxas")
+    p.add_argument("--metric", choices=["ms", "spill_bytes"], default="ms")
     p.add_argument("--warmup", type=int, default=25)
     p.add_argument("--rep", type=int, default=50)
     p.add_argument("--bench", choices=["cudagraph", "do_bench"], default="cudagraph")
@@ -440,6 +542,8 @@ def main(argv=None) -> int:
         return _cmd_doctor()
     if argv and argv[0] == "_score":
         return _cmd_score(_score_parser().parse_args(argv[1:]))
+    if argv and argv[0] == "register_spill":
+        return _cmd_register_spill(_register_spill_parser().parse_args(argv[1:]))
     if argv and argv[0] == "replay":
         args, command = _replay_parser().parse_args(argv[1:]), _cmd_replay
     else:

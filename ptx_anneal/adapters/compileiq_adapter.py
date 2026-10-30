@@ -9,7 +9,8 @@ and the engine can live in any interpreter/venv.
 
 Contract (all via env, set by the harness):
     PTX_ANNEAL_SCORE_CMD   JSON argv prefix for the harness scorer, e.g. ["/path/ptx_anneal","_score"]
-    PTX_ANNEAL_TASK        task dir (kernel.ptx + spec.json)
+    PTX_ANNEAL_TASK        task dir (kernel.ptx + spec.json), or PTX file for spill_bytes
+    PTX_ANNEAL_METRIC      ms (default), or spill_bytes (compile-only; no GPU clock locking)
     PTX_ANNEAL_PTXAS       ptxas to assemble/apply ACFs with
     PTX_ANNEAL_SS          search-space .bin (OPTIONAL -- unset means "fetch the published catalog")
     PTX_ANNEAL_RESULT      path to write the result JSON to
@@ -20,9 +21,9 @@ Contract (all via env, set by the harness):
     CIQ_SS_VERSION / CIQ_SS_VARIANT / CIQ_SS_TAG   catalog selector, when PTX_ANNEAL_SS is unset
 
 Per candidate the engine hands a hex ACF; we shell out to `SCORE_CMD _? --task .. --acf f --ptxas ..`
-which prints "MS <float>" (valid) or "INVALID". At the end we write
+which prints "MS <float>" (or "SPILL_BYTES <int>") on success, or "INVALID". At the end we write
 {"best_ms","evaluated","valid","acf","search_space","engine_info","budget"} (acf = winning hex or
-null) to PTX_ANNEAL_RESULT.
+null) to PTX_ANNEAL_RESULT. Spill tuning uses "best_spill_bytes" in place of "best_ms".
 
 ``budget`` reports what the search ACTUALLY ran with -- not what was requested -- so the caller can
 put it in a search-problem fingerprint. Two channels driving this same adapter are only comparable
@@ -43,6 +44,7 @@ import atexit
 import contextlib
 import hashlib
 import json
+import math
 import os
 import re
 import shlex
@@ -219,6 +221,9 @@ def main() -> int:
     ptxas = os.environ["PTX_ANNEAL_PTXAS"]
     ss = os.environ.get("PTX_ANNEAL_SS") or ""
     result_path = os.environ["PTX_ANNEAL_RESULT"]
+    metric = os.environ.get("PTX_ANNEAL_METRIC", "ms")
+    if metric not in ("ms", "spill_bytes"):
+        raise SystemExit(f"compileiq_adapter: unknown metric: {metric!r}")
     warmup = os.environ.get("PTX_ANNEAL_WARMUP", "25")
     rep = os.environ.get("PTX_ANNEAL_REP", "50")
     gens = int(os.environ.get("CIQ_GENERATIONS", "1"))
@@ -226,7 +231,7 @@ def main() -> int:
     if pool == 0:
         pool = None
     task_timeout = _env_num("CIQ_TASK_TIMEOUT", float)
-    clock_mhz = _env_num("CIQ_CLOCK_MHZ", int)
+    clock_mhz = _env_num("CIQ_CLOCK_MHZ", int) if metric == "ms" else None
 
     from compileiq.ciq import Search
     from compileiq.types import INVALID_SCORE, SearchConfiguration
@@ -266,11 +271,9 @@ def main() -> int:
                 path,
                 "--ptxas",
                 ptxas,
-                "--warmup",
-                str(warmup),
-                "--rep",
-                str(rep),
             ]
+            if metric == "ms":
+                cmd.extend(["--warmup", str(warmup), "--rep", str(rep)])
             try:
                 # THE scorer must be bounded here, by us. The engine's own `task_timeout` bounds its
                 # worker, not our grandchild process -- so without this a candidate whose kernel hangs
@@ -288,8 +291,15 @@ def main() -> int:
         if timed_out:
             seen["timeout"] += 1
         last = "" if out is None or not out.stdout.strip() else out.stdout.strip().splitlines()[-1]
-        ok = last.startswith("MS ")
-        ms = float(last.split()[1]) if ok else None
+        score = None
+        if out is not None and out.returncode == 0 and last.startswith(f"{metric.upper()} "):
+            try:
+                score = float(last.split()[1])
+            except (ValueError, IndexError):
+                score = None
+        ok = score is not None and math.isfinite(score) and score >= 0
+        if metric == "spill_bytes" and ok:
+            ok = score.is_integer()
         if ok:
             seen["valid"] += 1
         print(
@@ -297,7 +307,7 @@ def main() -> int:
                 {
                     "kind": "candidate",
                     "index": seen["n"],
-                    "ms": ms,
+                    metric: score if ok else None,
                     "ok": ok,
                     "timeout": timed_out,
                     "acf": acf_hex[:16],
@@ -306,7 +316,7 @@ def main() -> int:
             file=sys.stderr,
             flush=True,
         )
-        return ms if ok else INVALID_SCORE
+        return score if ok else INVALID_SCORE
 
     cfg = SearchConfiguration(problem_type="min", generations=gens, pool_size=pool)
     # exit_on_failure=False: by default the engine raises if EVERY candidate fails in the first
@@ -340,11 +350,11 @@ def main() -> int:
     df = result.get_results() if result is not None else None
     evaluated = len(df) if df is not None else seen["n"]
     best = result.get_best_result() if result is not None else None
-    best_ms = best.get("score_1", best.get("score")) if best else None
+    best_score = best.get("score_1", best.get("score")) if best else None
     params = best.get("params") if best else None
-    acf_hex = params if (params and isinstance(best_ms, (int, float))) else None
+    acf_hex = params if (params and isinstance(best_score, (int, float))) else None
     payload = {
-        "best_ms": float(best_ms) if acf_hex else None,
+        f"best_{metric}": float(best_score) if acf_hex else None,
         "evaluated": evaluated,
         "valid": seen["valid"],
         # Counted and reported, never just logged: a timed-out candidate is scope that was silently
@@ -366,8 +376,8 @@ def main() -> int:
             "pool_size": pool,
             "task_timeout": task_timeout,
             "clock_mhz": clock_mhz,
-            "warmup": int(warmup),
-            "rep": int(rep),
+            "warmup": int(warmup) if metric == "ms" else None,
+            "rep": int(rep) if metric == "ms" else None,
             "seed": None,
         },
     }

@@ -57,6 +57,31 @@ Step 3. ACF consumption: On an ACF-store hit, re-assemble the kernel with the AC
 TRITON_COMPILE_IQ_APPLY=1 COMPILE_IQ_STORE=$STORE python your_workload.py
 ```
 
+## Tune register spills from a PTX file
+
+`register_spill` uses CompileIQ to minimize the sum of spill-store and spill-load bytes reported
+by `ptxas -v`, summed across all functions in the file:
+
+```bash
+ptx_anneal register_spill --task /path/to/kernel.ptx
+# Optional compiler/search-space pins and a larger search budget:
+CIQ_POOL=16 CIQ_GENERATIONS=4 ptx_anneal register_spill --task kernel.ptx --ptxas /path/to/ptxas --ss space.bin
+```
+
+Here `--task` is a **local PTX file**. The architecture comes from its `.target` directive. Only
+Python, ptxas >= 13.3 and the installed engine are needed; there is no launch spec or GPU execution.
+The usual `--engine-python`, `--engine-adapter`, and search-space environment pins also apply.
+
+Each candidate is compiled with `--apply-controls`. Compilation failures or missing spill diagnostics
+are invalid; zero spill bytes is valid. Only a candidate that reduces spills against the untuned
+baseline is saved. A completed search returns 0 even if no candidate improves on the baseline.
+
+Winning ACFs and `.acf.json` provenance are written under `register_spill/` in the default ACF
+store (`$COMPILE_IQ_STORE` or `~/.compile_iq/store`), or to the store selected by `--output`/`--store`.
+The sidecar records the spill objective and scores, ptxas version, engine identity, and search space.
+Spill bytes are a static compiler metric: this command does not measure speed or validate numerical
+correctness, so its default output is separate from the runtime tuning store.
+
 ## Replay PTX without tuning
 
 `replay` assembles a captured task and benchmarks it without CompileIQ, a search space, or an ACF:
