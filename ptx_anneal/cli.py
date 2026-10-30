@@ -365,11 +365,7 @@ def _cmd_register_spill(args) -> int:
         best = res.get("best_spill_bytes")
         acf_hex = res.get("acf")
         valid = (
-            bool(acf_hex)
-            and isinstance(best, (int, float))
-            and math.isfinite(best)
-            and best >= 0
-            and best == int(best)
+            bool(acf_hex) and isinstance(best, (int, float)) and math.isfinite(best) and best >= 0 and best == int(best)
         )
         counts = f"evaluated={res.get('evaluated', 0)} valid={res.get('valid')} timeout={res.get('timeout', 0)}"
         if valid and best < baseline:
@@ -501,7 +497,9 @@ def _register_spill_parser() -> argparse.ArgumentParser:
     )
     p.add_argument("--task", required=True, help="local PTX file (not a task directory)")
     p.add_argument(
-        "--output", "--store", dest="output",
+        "--output",
+        "--store",
+        dest="output",
         help="ACF store root (default: register_spill/ under the default ACF store)",
     )
     _add_provisioning_pins(p)

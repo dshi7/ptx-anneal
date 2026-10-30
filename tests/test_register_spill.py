@@ -133,7 +133,10 @@ def test_register_spill_saves_zero_spill_winner_and_provenance(compiler, search,
     assert search.env["PTX_ANNEAL_METRIC"] == "spill_bytes"
     assert search.env["PTX_ANNEAL_SS"] == str(ss)
     assert json.loads(search.env["PTX_ANNEAL_SCORE_CMD"]) == [
-        *cli._harness_cmd(), "_score", "--metric", "spill_bytes",
+        *cli._harness_cmd(),
+        "_score",
+        "--metric",
+        "spill_bytes",
     ]
     assert not Path(search.env["PTX_ANNEAL_RESULT"]).exists()
     assert "baseline=24 best=0 spill bytes" in capsys.readouterr().out
