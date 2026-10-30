@@ -41,6 +41,7 @@ import tempfile
 from . import fingerprint as fp_mod
 from . import provision
 from . import task as task_mod
+from .ptx_launch import DEFAULT_PTXAS_FLAGS
 from .store import LocalStore, default_store_root
 from .target import load_target
 
@@ -78,7 +79,7 @@ def _fingerprint(args, t, ptxas: str, ver: str | None, res: dict) -> dict:
         # produced it did its work at COLLECT time and is not an input here. Recorded as empty rather
         # than omitted, so a diff against the triton-native channel shows the difference explicitly.
         frontend={},
-        ptxas={"path": ptxas, "version": ver, "flags": fp_mod.ptxas_flags()},
+        ptxas={"path": ptxas, "version": ver, "flags": [*DEFAULT_PTXAS_FLAGS, *fp_mod.ptxas_flags()]},
         search_space=res.get("search_space") or {},
         engine={**(res.get("engine_info") or {}), "budget": res.get("budget") or {}},
         objective={
@@ -285,6 +286,7 @@ def _cmd_tune(args) -> int:
             "engine": engine_name,
             "valid": valid,
             "ptxas_version": ver,
+            "ptxas_flags": list(DEFAULT_PTXAS_FLAGS),
             # Which search space produced this ACF. The search space is a tuning *input*, and the
             # engine resolves it to "latest" by default, so recording it is what keeps an admitted
             # ACF explainable (and a pinned CIQ_SS_TAG meaningful) after the catalog moves on.
@@ -380,7 +382,7 @@ def _cmd_register_spill(args) -> int:
                 "evaluated": res.get("evaluated", 0),
                 "valid": res.get("valid"),
                 "ptxas_version": ver,
-                "ptxas_flags": [f"-arch={arch}", "-v"],
+                "ptxas_flags": [f"-arch={arch}", *DEFAULT_PTXAS_FLAGS, "-v"],
                 "search_space": res.get("search_space") or None,
                 "engine_info": res.get("engine_info") or None,
                 "budget": res.get("budget") or {},

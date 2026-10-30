@@ -56,6 +56,7 @@ def test_spill_scoring_uses_all_functions_and_preserves_acf(compiler, diagnostic
     assert ptx_launch.ptxas_spill_bytes(PTX, "/tools/ptxas", acf_path="/a path/controls.acf") == expected
     cmd = compiler.calls[0]
     assert "--apply-controls=/a path/controls.acf" in cmd
+    assert "--regAllocOptLevel=2" in cmd  # default flag, applied to every compile
     assert not Path(cmd[2]).exists()  # temporary PTX and cubin are cleaned up
     assert not Path(cmd[cmd.index("-o") + 1]).exists()
 
