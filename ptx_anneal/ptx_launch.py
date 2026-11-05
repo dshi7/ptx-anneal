@@ -691,12 +691,23 @@ def alloc_tensors(spec, device="cuda", seed=0):
         "int32": torch.int32,
         "int64": torch.int64,
         "int8": torch.int8,
+        "uint8": torch.uint8,
+        "bool": torch.bool,
+        "float8_e4m3fn": torch.float8_e4m3fn,
     }
     out = []
     for t in spec["tensors"]:
         dt = dts[t["dtype"]]
         x = torch.empty_strided(t["shape"], t["strides"], dtype=dt, device=device)
-        x.normal_() if dt.is_floating_point else x.zero_()
+        if dt.is_floating_point and dt.itemsize == 1:
+            # FP8 has no normal_ kernel: sample float32 over the whole (possibly strided) storage
+            # and let copy_ cast it down.
+            flat = torch.empty(0, dtype=dt, device=device).set_(x.untyped_storage())
+            flat.copy_(torch.randn(flat.numel(), device=device))
+        elif dt.is_floating_point:
+            x.normal_()
+        else:
+            x.zero_()
         out.append(x)
     return out
 
