@@ -1,0 +1,68 @@
+{
+  "entry": "triton_per_fused_sum_10",
+  "arch": "sm_100a",
+  "shared": 1024,
+  "block": [
+    64,
+    1,
+    1
+  ],
+  "grid": [
+    8,
+    1,
+    1
+  ],
+  "ptxas": "",
+  "ptxas_version": "13.3",
+  "tensors": [
+    {
+      "shape": [
+        1,
+        1024,
+        2
+      ],
+      "dtype": "float32",
+      "strides": [
+        2048,
+        1,
+        1024
+      ],
+      "pickle_sha256": "55e512ad97846a5a088f2a5a5baf2515c448424ae990a06057d1e79c20fef5a9"
+    },
+    {
+      "shape": [
+        1,
+        1024
+      ],
+      "dtype": "float32",
+      "strides": [
+        1024,
+        1
+      ],
+      "pickle_sha256": "43122242d173fca10a288c9e386a6889fb35ba65878b6bf6af29c24db1d49588"
+    }
+  ],
+  "args": [
+    {
+      "t": 0
+    },
+    {
+      "t": 1
+    },
+    {
+      "i32": 1024
+    },
+    {
+      "i32": 2
+    },
+    {
+      "null": true
+    },
+    {
+      "null": true
+    }
+  ],
+  "ptx_sha256": "5a28b36855b8e7843824f43bdcfbb9da3e87f08cf59efeb0d49c93343481a226",
+  "kernel_name": "triton_per_fused_sum_10",
+  "fn_name": "triton_per_fused_sum_10"
+}

@@ -1,0 +1,286 @@
+{
+  "entry": "_block_attention",
+  "arch": "sm_100a",
+  "shared": 188976,
+  "block": [
+    640,
+    1,
+    1
+  ],
+  "grid": [
+    148,
+    1,
+    1
+  ],
+  "ptxas": "",
+  "ptxas_version": "13.3",
+  "tensors": [
+    {
+      "shape": [
+        146018,
+        3,
+        128
+      ],
+      "dtype": "bfloat16",
+      "strides": [
+        384,
+        128,
+        1
+      ]
+    },
+    {
+      "shape": [
+        146018,
+        3,
+        128
+      ],
+      "dtype": "bfloat16",
+      "strides": [
+        384,
+        128,
+        1
+      ]
+    },
+    {
+      "shape": [
+        146018,
+        3,
+        128
+      ],
+      "dtype": "bfloat16",
+      "strides": [
+        384,
+        128,
+        1
+      ]
+    },
+    {
+      "shape": [
+        146018,
+        3,
+        128
+      ],
+      "dtype": "bfloat16",
+      "strides": [
+        384,
+        128,
+        1
+      ]
+    },
+    {
+      "shape": [
+        129
+      ],
+      "dtype": "int32",
+      "strides": [
+        1
+      ],
+      "pickle_sha256": "9c086494daf04fbf4aea0ef541376d6d250e34cc0a04a9eba300b1140f3c8d1d"
+    },
+    {
+      "shape": [
+        149
+      ],
+      "dtype": "int64",
+      "strides": [
+        1
+      ],
+      "pickle_sha256": "4a98d5df97333ea61e6bf58a23d446d6aeca400eb3e6e39d5ab85ae798e88a7b"
+    },
+    {
+      "shape": [
+        129
+      ],
+      "dtype": "int32",
+      "strides": [
+        1
+      ],
+      "pickle_sha256": "525d75b6959b4eadc680988f7be6278cc59140f31314dbed1e70b58d33f11466"
+    }
+  ],
+  "args": [
+    {
+      "t": 0
+    },
+    {
+      "t": 1
+    },
+    {
+      "t": 2
+    },
+    {
+      "t": 3
+    },
+    {
+      "t": 4
+    },
+    {
+      "t": 5
+    },
+    {
+      "t": 6
+    },
+    {
+      "i32": 384
+    },
+    {
+      "i32": 128
+    },
+    {
+      "tma": 0
+    },
+    {
+      "i32": 146018
+    },
+    {
+      "i32": 384
+    },
+    {
+      "i64": 384
+    },
+    {
+      "i64": 1
+    },
+    {
+      "tma": 1
+    },
+    {
+      "i32": 146018
+    },
+    {
+      "i32": 384
+    },
+    {
+      "i64": 384
+    },
+    {
+      "i64": 1
+    },
+    {
+      "tma": 2
+    },
+    {
+      "i32": 146018
+    },
+    {
+      "i32": 384
+    },
+    {
+      "i64": 384
+    },
+    {
+      "i64": 1
+    },
+    {
+      "tma": 3
+    },
+    {
+      "i32": 146018
+    },
+    {
+      "i32": 384
+    },
+    {
+      "i64": 384
+    },
+    {
+      "i64": 1
+    },
+    {
+      "i32": 146018
+    },
+    {
+      "f32": 0.08838834764831843
+    },
+    {
+      "i32": 128
+    },
+    {
+      "null": true
+    },
+    {
+      "null": true
+    }
+  ],
+  "tensordescs": [
+    {
+      "base": 0,
+      "desc_shape": [
+        146018,
+        384
+      ],
+      "desc_strides": [
+        384,
+        1
+      ],
+      "swizzle": 3,
+      "elem_size": 2,
+      "elem_type": 10,
+      "block_size": [
+        64,
+        64
+      ],
+      "padding": 0
+    },
+    {
+      "base": 1,
+      "desc_shape": [
+        146018,
+        384
+      ],
+      "desc_strides": [
+        384,
+        1
+      ],
+      "swizzle": 3,
+      "elem_size": 2,
+      "elem_type": 10,
+      "block_size": [
+        64,
+        64
+      ],
+      "padding": 0
+    },
+    {
+      "base": 2,
+      "desc_shape": [
+        146018,
+        384
+      ],
+      "desc_strides": [
+        384,
+        1
+      ],
+      "swizzle": 3,
+      "elem_size": 2,
+      "elem_type": 10,
+      "block_size": [
+        64,
+        64
+      ],
+      "padding": 0
+    },
+    {
+      "base": 3,
+      "desc_shape": [
+        146018,
+        384
+      ],
+      "desc_strides": [
+        384,
+        1
+      ],
+      "swizzle": 3,
+      "elem_size": 2,
+      "elem_type": 10,
+      "block_size": [
+        64,
+        64
+      ],
+      "padding": 0
+    }
+  ],
+  "ptx_sha256": "4bb6c1c96def3eef11516cb832eb7bf309693c65b7b3b8079b4380febf9fdd4e",
+  "kernel_name": "_block_attention",
+  "fn_name": "_block_attention"
+}

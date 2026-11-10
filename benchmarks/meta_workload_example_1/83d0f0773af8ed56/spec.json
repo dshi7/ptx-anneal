@@ -1,0 +1,120 @@
+{
+  "entry": "triton_red_fused_mul_native_layer_norm_sigmoid_2",
+  "arch": "sm_100a",
+  "shared": 192,
+  "block": [
+    256,
+    1,
+    1
+  ],
+  "grid": [
+    128,
+    1,
+    1
+  ],
+  "ptxas": "",
+  "ptxas_version": "13.3",
+  "tensors": [
+    {
+      "shape": [
+        256,
+        1
+      ],
+      "dtype": "float32",
+      "strides": [
+        1,
+        1
+      ],
+      "pickle_sha256": "1e3144a772ea71b9437a2a239e68106ca21d2491338d6ece558b4f50224ece57"
+    },
+    {
+      "shape": [
+        256,
+        2048
+      ],
+      "dtype": "float32",
+      "strides": [
+        2048,
+        1
+      ]
+    },
+    {
+      "shape": [
+        2048
+      ],
+      "dtype": "float32",
+      "strides": [
+        1
+      ],
+      "pickle_sha256": "4726a8e8bef3f6cbdf5793ede4facce1aa4e0fa4d4edff3a648fb787f89a22b5"
+    },
+    {
+      "shape": [
+        2048
+      ],
+      "dtype": "float32",
+      "strides": [
+        1
+      ],
+      "pickle_sha256": "c3f792f21a0fcf0fc26e63cb01c282cdb0429fe3378a99a5e56d6d4a9952bb1d"
+    },
+    {
+      "shape": [
+        256,
+        1
+      ],
+      "dtype": "float32",
+      "strides": [
+        1,
+        1
+      ],
+      "pickle_sha256": "c00c5314ea6da4961dedebcaa5b206d4564445e03ae36667b04294d5883020ea"
+    },
+    {
+      "shape": [
+        256,
+        2048
+      ],
+      "dtype": "float32",
+      "strides": [
+        2048,
+        1
+      ]
+    }
+  ],
+  "args": [
+    {
+      "t": 0
+    },
+    {
+      "t": 1
+    },
+    {
+      "t": 2
+    },
+    {
+      "t": 3
+    },
+    {
+      "t": 4
+    },
+    {
+      "t": 5
+    },
+    {
+      "i32": 256
+    },
+    {
+      "i32": 2048
+    },
+    {
+      "null": true
+    },
+    {
+      "null": true
+    }
+  ],
+  "ptx_sha256": "83d0f0773af8ed56d9b9151e31938651298bfb03f76490d3e25e0f9a69d7d378",
+  "kernel_name": "triton_red_fused_mul_native_layer_norm_sigmoid_2",
+  "fn_name": "triton_red_fused_mul_native_layer_norm_sigmoid_2"
+}

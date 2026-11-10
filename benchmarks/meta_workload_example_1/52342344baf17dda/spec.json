@@ -1,0 +1,152 @@
+{
+  "entry": "triton_per_fused_add_mul_native_layer_norm_native_layer_norm_backward_sigmoid_backward_16",
+  "arch": "sm_100a",
+  "shared": 32,
+  "block": [
+    64,
+    1,
+    1
+  ],
+  "grid": [
+    16,
+    1,
+    1
+  ],
+  "ptxas": "",
+  "ptxas_version": "13.3",
+  "tensors": [
+    {
+      "shape": [
+        256,
+        512
+      ],
+      "dtype": "float32",
+      "strides": [
+        512,
+        1
+      ],
+      "pickle_sha256": "ee41febf0a541bbce80b0cb2cf8a24e6a57542a8c929724774a158c9d9c5e7c8"
+    },
+    {
+      "shape": [
+        256,
+        512
+      ],
+      "dtype": "float32",
+      "strides": [
+        512,
+        1
+      ],
+      "pickle_sha256": "6699f694c6160080ff96a96be38606e9d13caeb7c01e150cd087fa5a2a3aa2f2"
+    },
+    {
+      "shape": [
+        256,
+        512
+      ],
+      "dtype": "float32",
+      "strides": [
+        512,
+        1
+      ],
+      "pickle_sha256": "9ad58dea7b399f2bada19389afdd43ce818b9531ac4c1c226330c1959a33e74f"
+    },
+    {
+      "shape": [
+        512
+      ],
+      "dtype": "float32",
+      "strides": [
+        1
+      ],
+      "pickle_sha256": "1abf6a2c39bb65300438df06c51cf17536de4f78b270ae42f40ede9ef549431e"
+    },
+    {
+      "shape": [
+        256,
+        1
+      ],
+      "dtype": "float32",
+      "strides": [
+        1,
+        1
+      ],
+      "pickle_sha256": "ced58e32115a93ed3d87c23cd618df5a36de8ff3ab6e7984e6821d02ff31c573"
+    },
+    {
+      "shape": [
+        256,
+        1
+      ],
+      "dtype": "float32",
+      "strides": [
+        1,
+        1
+      ],
+      "pickle_sha256": "7236748fe7b0c809467cbf0e869e92c577223544ecc050b2bfc635de6abff82e"
+    },
+    {
+      "shape": [
+        256,
+        512
+      ],
+      "dtype": "float32",
+      "strides": [
+        512,
+        1
+      ],
+      "pickle_sha256": "02a2721b1135249b3260a9cc140693fb29c5434bb20be809b439f65069058644"
+    },
+    {
+      "shape": [
+        16384
+      ],
+      "dtype": "float32",
+      "strides": [
+        1
+      ],
+      "pickle_sha256": "1375119a9ec404baf9216aff76d86dad28d49a4a97fa97b15fc9966d3585ba2a"
+    }
+  ],
+  "args": [
+    {
+      "t": 0
+    },
+    {
+      "t": 1
+    },
+    {
+      "t": 2
+    },
+    {
+      "t": 3
+    },
+    {
+      "t": 4
+    },
+    {
+      "t": 5
+    },
+    {
+      "t": 6
+    },
+    {
+      "t": 7
+    },
+    {
+      "i32": 256
+    },
+    {
+      "i32": 512
+    },
+    {
+      "null": true
+    },
+    {
+      "null": true
+    }
+  ],
+  "ptx_sha256": "52342344baf17dda11d0dbc9b9ea6654b3622b7ea47269c13683513ceef0906b",
+  "kernel_name": "triton_per_fused_add_mul_native_layer_norm_native_layer_norm_backward_sigmoid_backward_16",
+  "fn_name": "triton_per_fused_add_mul_native_layer_norm_native_layer_norm_backward_sigmoid_backward_16"
+}

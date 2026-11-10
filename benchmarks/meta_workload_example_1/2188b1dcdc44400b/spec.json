@@ -1,0 +1,128 @@
+{
+  "entry": "triton_per_fused_mul_native_layer_norm_sigmoid_8",
+  "arch": "sm_100a",
+  "shared": 0,
+  "block": [
+    32,
+    1,
+    1
+  ],
+  "grid": [
+    38272,
+    1,
+    1
+  ],
+  "ptxas": "",
+  "ptxas_version": "13.3",
+  "tensors": [
+    {
+      "shape": [
+        299,
+        256,
+        1
+      ],
+      "dtype": "float32",
+      "strides": [
+        256,
+        1,
+        1
+      ],
+      "pickle_sha256": "792e9427787ce63d8d2baa0c1bc98c9ef8661ff5b04daab6212afc1dffa21f06"
+    },
+    {
+      "shape": [
+        299,
+        256,
+        512
+      ],
+      "dtype": "float32",
+      "strides": [
+        131072,
+        512,
+        1
+      ]
+    },
+    {
+      "shape": [
+        512
+      ],
+      "dtype": "float32",
+      "strides": [
+        1
+      ],
+      "pickle_sha256": "024d25a63096a60019b5d99690c27c39f84d82fef768c70b2f6a08045b7dbcd3"
+    },
+    {
+      "shape": [
+        512
+      ],
+      "dtype": "float32",
+      "strides": [
+        1
+      ],
+      "pickle_sha256": "f6d387a79c8a37101c071b5d1ac883a1e756a76881143f94e4750cbdbbceea31"
+    },
+    {
+      "shape": [
+        299,
+        256,
+        1
+      ],
+      "dtype": "float32",
+      "strides": [
+        256,
+        1,
+        1
+      ],
+      "pickle_sha256": "80a3a4643bb3f4fda7c53d7bb8cd2b27b98c846c0514a12b0e4f66ac4dc18621"
+    },
+    {
+      "shape": [
+        299,
+        256,
+        512
+      ],
+      "dtype": "float32",
+      "strides": [
+        131072,
+        512,
+        1
+      ]
+    }
+  ],
+  "args": [
+    {
+      "t": 0
+    },
+    {
+      "t": 1
+    },
+    {
+      "t": 2
+    },
+    {
+      "t": 3
+    },
+    {
+      "t": 4
+    },
+    {
+      "t": 5
+    },
+    {
+      "i32": 76544
+    },
+    {
+      "i32": 512
+    },
+    {
+      "null": true
+    },
+    {
+      "null": true
+    }
+  ],
+  "ptx_sha256": "2188b1dcdc44400b62d7f2139ed9b5754fce0035774d437d5db3c7c9d881b929",
+  "kernel_name": "triton_per_fused_mul_native_layer_norm_sigmoid_8",
+  "fn_name": "triton_per_fused_mul_native_layer_norm_sigmoid_8"
+}

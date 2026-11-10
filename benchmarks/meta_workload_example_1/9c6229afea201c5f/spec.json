@@ -1,0 +1,75 @@
+{
+  "entry": "triton_poi_fused_mul_sigmoid_sigmoid_backward_12",
+  "arch": "sm_100a",
+  "shared": 0,
+  "block": [
+    128,
+    1,
+    1
+  ],
+  "grid": [
+    1594,
+    1,
+    1
+  ],
+  "ptxas": "",
+  "ptxas_version": "13.3",
+  "tensors": [
+    {
+      "shape": [
+        256,
+        6376
+      ],
+      "dtype": "float32",
+      "strides": [
+        6400,
+        1
+      ]
+    },
+    {
+      "shape": [
+        256,
+        6376
+      ],
+      "dtype": "float32",
+      "strides": [
+        6376,
+        1
+      ]
+    },
+    {
+      "shape": [
+        256,
+        6376
+      ],
+      "dtype": "float32",
+      "strides": [
+        6400,
+        1
+      ]
+    }
+  ],
+  "args": [
+    {
+      "t": 0
+    },
+    {
+      "t": 1
+    },
+    {
+      "t": 2
+    },
+    {
+      "i32": 1632256
+    },
+    {
+      "null": true
+    },
+    {
+      "null": true
+    }
+  ],
+  "ptx_sha256": "9c6229afea201c5f3fcfa2b5736d81261bd93c9d7117a91ff32b3b6cea085fe9",
+  "kernel_name": "triton_poi_fused_mul_sigmoid_sigmoid_backward_12",
+  "fn_name": "triton_poi_fused_mul_sigmoid_sigmoid_backward_12"
+}

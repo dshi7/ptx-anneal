@@ -1,0 +1,49 @@
+{
+  "entry": "triton_poi_fused_clamp_nan_to_num_permute_7",
+  "arch": "sm_100a",
+  "shared": 0,
+  "block": [
+    128,
+    1,
+    1
+  ],
+  "grid": [
+    76544,
+    1,
+    1
+  ],
+  "ptxas": "",
+  "ptxas_version": "13.3",
+  "tensors": [
+    {
+      "shape": [
+        299,
+        256,
+        1024
+      ],
+      "dtype": "float32",
+      "strides": [
+        262144,
+        1,
+        256
+      ]
+    }
+  ],
+  "args": [
+    {
+      "t": 0
+    },
+    {
+      "i32": 78381056
+    },
+    {
+      "null": true
+    },
+    {
+      "null": true
+    }
+  ],
+  "ptx_sha256": "e0c0197ab5b7802eac587aea0457750827438d04a156bf48320b5c557e230ccb",
+  "kernel_name": "triton_poi_fused_clamp_nan_to_num_permute_7",
+  "fn_name": "triton_poi_fused_clamp_nan_to_num_permute_7"
+}

@@ -1,0 +1,3778 @@
+{
+  "entry": "triton_for_fused_4",
+  "arch": "sm_100a",
+  "shared": 0,
+  "block": [
+    256,
+    1,
+    1
+  ],
+  "grid": [
+    3916,
+    1,
+    1
+  ],
+  "ptxas": "",
+  "ptxas_version": "13.3",
+  "tensors": [
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "a970ae1b7547f3fb19fcb643ed8464e874d08e337d8b68b25d1d2c02d06d3be0"
+    },
+    {
+      "shape": [
+        256,
+        160
+      ],
+      "dtype": "float32",
+      "strides": [
+        160,
+        1
+      ],
+      "pickle_sha256": "666fe7b02d01e90f526e4c1cb85b521f82614e9d3a6a04ddb60214056e76a3b7"
+    },
+    {
+      "shape": [
+        256,
+        160
+      ],
+      "dtype": "float32",
+      "strides": [
+        160,
+        1
+      ],
+      "pickle_sha256": "92744cb44c59fc5473d2c95a28e10ca410afa3b60598b125ba3a2cb9275af6c3"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "561a47fe7862cc6ec3dc06b69806b0686c12bfb79e313bb889df512ef19a9af5"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "4e749ddc9e31bdd45bae65d36189de543a0084de7ab07cffd83f6359d695eeb1"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "e6cb2c7dfa61f318f422c6a2dcc488f09cd3fd07a71d8830822663ee09a9f528"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "2b6268afce035dc8851fe3577b232fb80906f37661af5d86593993c5d2f0e5ea"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "335c6406783288986ad5aeba22ae124a5d0d373cc3a9e86112bf7787f0c6ffee"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "f299bcb23f06efceced0660a171a5b6e0a4d6d6999dfca090e2e9c72843acfd2"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "5c04f28bfb17cef5b9fd7476a1d126038ff14c7b98b8285b9b07c1c6087b15c8"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "e650baa4f9c2c1c28bd366b8c7deb5c2c494784361aff4418f8c47c4f0edec35"
+    },
+    {
+      "shape": [
+        256,
+        512
+      ],
+      "dtype": "float32",
+      "strides": [
+        512,
+        1
+      ],
+      "pickle_sha256": "c77ff8507732b47edc4f1f20d912209d2ae2ef8b87855dec6e8f49644031e99f"
+    },
+    {
+      "shape": [
+        256,
+        96
+      ],
+      "dtype": "float32",
+      "strides": [
+        96,
+        1
+      ],
+      "pickle_sha256": "b7904ebfa602ef053a6f9ab652081a3938d105e5661201c332bd028e5a005651"
+    },
+    {
+      "shape": [
+        256,
+        96
+      ],
+      "dtype": "float32",
+      "strides": [
+        96,
+        1
+      ],
+      "pickle_sha256": "28f0d808b569738d42d87d89a7fc27e13ca9ea5a74eaff2ed33f9c2f175c3543"
+    },
+    {
+      "shape": [
+        256,
+        96
+      ],
+      "dtype": "float32",
+      "strides": [
+        96,
+        1
+      ],
+      "pickle_sha256": "16b44ed139781f486e76dac6c7602529a902ced198c65b42434c14b00b8defbe"
+    },
+    {
+      "shape": [
+        256,
+        160
+      ],
+      "dtype": "float32",
+      "strides": [
+        160,
+        1
+      ],
+      "pickle_sha256": "8c283a7193eba41a0ae2365def4f2595d6cbd65715bf804c215af345149833f6"
+    },
+    {
+      "shape": [
+        256,
+        160
+      ],
+      "dtype": "float32",
+      "strides": [
+        160,
+        1
+      ],
+      "pickle_sha256": "09fd764fc442447eb6a81c171b3599512a9eda8e90d4f0363100c3a75fa9a484"
+    },
+    {
+      "shape": [
+        256,
+        160
+      ],
+      "dtype": "float32",
+      "strides": [
+        160,
+        1
+      ],
+      "pickle_sha256": "d9c13ea855ec3c9c18f34a55c9a5b3aeabb5f291d80ae17f13f425262173deeb"
+    },
+    {
+      "shape": [
+        256,
+        96
+      ],
+      "dtype": "float32",
+      "strides": [
+        96,
+        1
+      ],
+      "pickle_sha256": "d7401da2fff577d841c8701965a817f8e0f7e0135c5cd1f814df837a293a2e51"
+    },
+    {
+      "shape": [
+        256,
+        96
+      ],
+      "dtype": "float32",
+      "strides": [
+        96,
+        1
+      ],
+      "pickle_sha256": "a74783a8db4adbdc6590e40d691b9d16d85d21181c9a18abb6cb4d1424a743d3"
+    },
+    {
+      "shape": [
+        256,
+        96
+      ],
+      "dtype": "float32",
+      "strides": [
+        96,
+        1
+      ],
+      "pickle_sha256": "3615a4d7c07352a01bb1fc7c00787548aae5c1765e54bcab7191693001357bee"
+    },
+    {
+      "shape": [
+        256,
+        1024
+      ],
+      "dtype": "float32",
+      "strides": [
+        1024,
+        1
+      ]
+    },
+    {
+      "shape": [
+        256,
+        96
+      ],
+      "dtype": "float32",
+      "strides": [
+        96,
+        1
+      ],
+      "pickle_sha256": "1eac66fc02a580aa6da12020ebe47cc68dec22747d74343476292f6fff89420b"
+    },
+    {
+      "shape": [
+        256,
+        96
+      ],
+      "dtype": "float32",
+      "strides": [
+        96,
+        1
+      ],
+      "pickle_sha256": "72de6fe40af5de0e28861d014cd42f56035a60e61ca0c94564137b26e4e351e7"
+    },
+    {
+      "shape": [
+        256,
+        96
+      ],
+      "dtype": "float32",
+      "strides": [
+        96,
+        1
+      ],
+      "pickle_sha256": "6db288dd647c64f4a467302cba1c5fe4cb995a1753e6ce361d8e7854d3afe00e"
+    },
+    {
+      "shape": [
+        256,
+        96
+      ],
+      "dtype": "float32",
+      "strides": [
+        96,
+        1
+      ],
+      "pickle_sha256": "b33718b79f8b906a4b8202d581df07ce93fce7db7271cc7fbd257f027a6b4b81"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "d59f97ac4348baf8e0ebbf3d72ef48345c9fbf68abc52863a9e5e86512ca6d25"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "75e9e4b20b1e1fdfd28c06846ae93cada3ef6fab346d9476d5cf1e396f2ede18"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "ff558022f1670f836f21d1032e1ae7a9bf225e7cc212c875aa9f6df70b3a124b"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "b0d3983a796f40b69d15c04ebdc6cc28fce0b65d0673558557acf2b8e9958595"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "b16c0b920eb871d1981ce6f91a08f6d6aa4f88ebad241d343ad182468563f3d2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "1f5ee758f93558801c308668544b1f399f976e65861299df3887c47dd3e82580"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "26c2e2b7462bb43af5bb71e7a8c104930f4ad4abd2c372604d9a939f5019b618"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "5cf67dd4726581527123f226688b2a872517d99028d98ad5921c956a8c716035"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "6ef04fded2f8fd2e246f4cb274201d8ea567c23edef0e8aedc52bb8ed3331b96"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "a69091a3ec2c002366d8f271f3d0a4d19c8fb1b93f771cc057cc954e35e6199d"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "859c59f03d739b2bc7bff37233c3bbe747176f4e26894324583efa2e95fb0bbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "1579e623da9a9f765047c665aae869aa9e36e230a4aeaac763b2eab7b9bdd71e"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "140fb9528db88f06a82616ed3f446b684e9a1f7c2cccb9cd846af73aa77bd46e"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "39e67312ec5b4a0c391ab69c036ee4eed56ed95b071a8ec4a9629cfa006d5fb2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "48646bc59709b5e39a14155dd2df82fe38330dd3564a5ab8f4aa533e0d8c945c"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "bdfb25d853d571cad4e51c6902f352056021ab9dc90d5195da62eef0798ceab8"
+    },
+    {
+      "shape": [
+        256,
+        64
+      ],
+      "dtype": "float32",
+      "strides": [
+        64,
+        1
+      ],
+      "pickle_sha256": "24a4641940197079ab50bfa7a26de6695261bbcdf7300e145be97d4eb96a4223"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "f5d5ba72655ead5f8caaf866837a48831bf378eb8d2c1152409d436209d276fb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "a88d560fe335c3f6d9bd3d7c50e90d5fe24befdc5d5e830cc34d800d29ac86e0"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "3f6436780bda7528481b61e9a5c534c6db23586da0b3994ad977315e5accc4e0"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "1e8176c0687abaa89503a9768cc0c3fdc607e9e2ca17309170a75e2b7da09f66"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "549f229c507ffebcff11f43f75b13e8a1ce15d3cc7088205dc786e20a11e4a9a"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "86ebe923cc532649e12ead7049fb1216c748f4f7e37acf69e8c928d3b6788561"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "799940cb7e64247b89d30e6263b3741bedaf21f2067c5f1c00fa3c847690c3ac"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "4aea234dfdef8bc5280b77cc5068006a88267d9715d634c29f5f5bde77f05d21"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "f80e56675f44d3d69414c3d96ee115c466863a1d0941c9414d346bf20eba79f1"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "3c54a23bfd4eea20c1f1f1f722b0ef6050e54d9cda82cde3128b673fa09ae3e4"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "9798d835878a2bad2ea7552ea48cf729c4abc816346a05132f5dc83c78dbe6a8"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "c0f054a75a9fba73075e3452e7dd329ed41d45a95af0167401be5b1d1c2888ac"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "9f5b9f149882b3c790f304c5663dba4e1e65d6a210bcb2e89743338cb9dd18cc"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "7cfdfe8f96334c682fa2c22fdae88d097074359d228942e1fb070a3806d14a4d"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "b151b8fc0b713bfbb9404503dfa376aaea9cfc823b0a7b5105c4a3bc03c9fb38"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "b5d5ac8b574dca5fb78387defddb64fe6149d44b81d10f9aee19ccc6f1330910"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "abdbe6c1562abc65665787b10c9ab70f61133ae3e418a0b4345e1f1522e6de7a"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "78d12b6c6490c93ecce06644bdd5132447dabc90bcdd3213fc6aa7754d31a628"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "9956b4eb8404338df68f661d66d781b8caab988d73c6d57834d6886277974bf5"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "b26a9d3065749f0b6aa993dafd30fecf2524770f7d11da59aa4b7cf0200d600b"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "abec5c37d04de61c48e58e740ed7958f75e79a243554a50f3cfd971c98d343c9"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "eba22e82392f4a6515a7a88e2acb33a9f10ecc41b1b14ba0fbfb7604f09d1fe7"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "c3a31fa1f1ec129f5299e5c04f198cfa9a785e95e4ed9e0b299da4285b4bdc44"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "97698915696d802ed29516a79bb87dbbafd2c949b5a98031b8f2e0fd0b924018"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "5d5528ec8d4976e41694d7962cd225197adeea39889b2a2e6eb8022f14ce01e1"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "da53eb631b3a2a49bb13dd46302cbc23e6557c1b6ab12dbad08ffc6fb4ff8d56"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "5d41d7aea1ba8976b4607a7704c6171e2e74208c9b871aa1027d0337dc36bed0"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "32fce04eff2dcf2ee3f8b80d991dd0cff504d207ecc46629778d22685d00834b"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "ff5f53e6b5a5c9ab049fab2f155e70b551ed9fa52c79489caa0e5bd469d46c73"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "6464b3e5e28f122f6beae7ee844a17535f9b0132799b3d54c1f5ac326b4b4f44"
+    },
+    {
+      "shape": [
+        256,
+        96
+      ],
+      "dtype": "float32",
+      "strides": [
+        96,
+        1
+      ],
+      "pickle_sha256": "95f089c5528e3df60d218a3f7211fd1600b8794defe3c1e4c1a6c5b92e4948e6"
+    },
+    {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "float32",
+      "strides": [
+        256,
+        1
+      ],
+      "pickle_sha256": "a27b1f278686e73132a111f149f3a012d0c5c3ca6b324890ff12e061c7fea68e"
+    },
+    {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "float32",
+      "strides": [
+        256,
+        1
+      ],
+      "pickle_sha256": "903c999d53c86dc874efeff6c5da95b634c10d96b15cb23f3aa10508d8ac7f6e"
+    },
+    {
+      "shape": [
+        256,
+        96
+      ],
+      "dtype": "float32",
+      "strides": [
+        96,
+        1
+      ],
+      "pickle_sha256": "b1262d66eb5e0aa5ea9a8e6665a422edfc418546101a15e356bcd7686dbfe019"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "e7222d82b7cf24e5e435f5fcd7f4a6d9965bed94cb2d370f1101fc3fee9f5537"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "13ca9359a83b6ac6911b47baa04c8cb04ee18b4c749fcc71baebf47a603b72e5"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "e8e4639840232c39b7d142afa7e124da76fe4025b6df80ff69fa499506203ec4"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "5cc1ccb05817f62eef91f1e416e3b42b971536deb4f7f5d36ddc58e5414b5569"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "dccbba9c4d0d0c305e41aa36488177c0d5babf41cf602edab2b65dcbd61f2159"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "3c2fe94876566e65236189819ce3719ff0a3a44fbed3a30e174174a58d8511da"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "c0db39c77bc986d309ec7cf6454c730550a069b7342a86385318f536ab2911eb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "f5f4e89eb14d1c8917c42c7c94f73f708be1e42d4c9bc46857b65e48dfbeef35"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "8277bbfa357f9fd21b62d859412af86cd1c59325034ffbccdd3da5f2e3fcc53a"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "27a9e43c2942d976522a5d0d06ea4f36fb2138c3167b2ae22881d74fe2f14882"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "eafa5f6684b82a3443f645f19961a424fec2e586a880ec084a270ffe190182f7"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "ec534132c43379cd46bad85dc08e978210b0063a123161a29ba0856d2e2e56ef"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "14be264e03b95ab7d5c9c599c43021d9c64f0b23ba3ce9d60068e4d222e54888"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "8f29335cac4584d7bad3b208fc17f62ff96b1a7f3dcf7d2d10b7dce6755e50b1"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "961a1bb0963d9a583ace2039ffbc3a59c549ad0b98a10c31670cd165028b018c"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "c963be003fdf2a6aa7aaa3d90d87bc955cd258a9ff9f59d465ea6ff5df604ed0"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "f8b471ceb2ca1c5804047915af111bd5e41de084d52c4755601dc14e03bb8ae9"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "bac94e5c479947a522a6cf6e40084eea8e4bb88611c36cfc06e843a0b06ad6d2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "341ff46dd3b59d42ecbdd654de864f265d45d695b4fb6692fa159114bf188e26"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "a8bcfbdaede08e598f92b066e2212a0b4ca26f9fdc8bf48b754870c3a8a7c537"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "2ec46ef03064a97b2586d5ebc9b6067cb44ab7dfebf788eb80db8aae8989c189"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "fd6b1eccaa0894bf3a7182b962ff578ac909973e48e2ff7c8dabe2f798f85d2a"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "338c112a245b41c581387da75434170125c66545f1aca43f08bf5e2eb3b81802"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "c600b55b227a461d153425c99e5d5bdac4a5d2abbf38d53e7e8004be843e80d1"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "a22182c5ef43bbd4c058087734c2050d94e41ecdcd710618a997e9cc99ad6bd0"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "de07062ab781b667b973f359e74d67ff0d3a819bb6ba65402064355df1184cbe"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "0389cf44fc3f5f1774b7a941114fa0d49932d9bb81e3a2f7c7c0ee27f17ff78f"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "ee91b146d0358d821679fb8ab86ae7f53e501ae228214e82bcc3cc44a1b5958b"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "76dadd9326fbcf3404afb648127290f4e20a8f7702132d8d145542a06a3e0baa"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "ff3f4bc08b506dc12fba076e1a2ad170904c854844e73e2ebaa80314a5e8493e"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "152f6bd671070471794213c3c75c703390c1731517b89c84e36712b4dec7c59a"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        128,
+        1
+      ],
+      "pickle_sha256": "a3aba970616d0b6de2601bf86a1e300aa3324b8b3f8cd9626703a0838e85e621"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "3c74e42eef862fadf414bc0ec0474e1f38058f0bda9aa64ce87eb60a5875047e"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "da204651838372110de2a909db66718b2b7b0f0020fbdf18b3a37ba3bd98c63d"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "5c6f2e2b10d4e96477565e70c7771406e371d968501eeeae042c29b95c0da6c1"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "6fe01ae472369248548766f4d2b024987622b933bc48bbbfa2b2b0ca8c5ce7cd"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "07102bc912fcfe9740496c0569c193b7621ae7ec716133ed4a45f5a9e288c157"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "49fa92fee119085a42d55c5726955184c75ee89bab4e160a16b5e6ad4f370d38"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "0b1e31a71e3815dcf3f706b509ff8c33d563c9d5d7117ef73dacbcd42f828754"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "73c740587cb695963137d1e4c2c69a56f9b11174d6554cea997b29bdb1a3d569"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "c40f785d4f6aae0844be64c4e1356702bace557dd500f5a1bb2adc15bf5f7be9"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "3200b10f98b3512ca6ba6079e86a765517ca147117246bf5a448c502beb7d6c2"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "d40df0998932e58fc393fefd0ca4cb87f40904fcbf3d4332d36f00aa5472ad45"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "367c74ac960b1df2179748325c54ccc3fd98b529ce4a3933c27ed12121fe18ce"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "1553728950f29da31638aae11b96fbd9a18fbefad57b3086bc3d560d3096cf51"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "a7cef0aa04e1bb1a55d813e7bc9dcad1ed8e11332e6833a39af65888a181953f"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "6f46188e45ac22e0279cb4b92a9e43ec3050beffe0f7ce9fd17228e264adf9e7"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        80,
+        1
+      ],
+      "pickle_sha256": "3c6a15ec454d8a95e50b30b05fe0eb011bd4f84fb7159a8096dc090065bf5175"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "0dbb7cb2a5ce89208fb0d23193831fcaf661cf30da09745728f834b6f23d6631"
+    },
+    {
+      "shape": [
+        256,
+        160
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "29631e7ea6469bf798a39ea1ff073a15ac93ba39827f1ade7a394efce55a33d3"
+    },
+    {
+      "shape": [
+        256,
+        160
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "92744cb44c59fc5473d2c95a28e10ca410afa3b60598b125ba3a2cb9275af6c3"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "96bb6f9849f2f4809e22b1bc2488cfb756177d65d5fd776dd7850b1042fb3c87"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "0dbb7cb2a5ce89208fb0d23193831fcaf661cf30da09745728f834b6f23d6631"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "96bb6f9849f2f4809e22b1bc2488cfb756177d65d5fd776dd7850b1042fb3c87"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "0dbb7cb2a5ce89208fb0d23193831fcaf661cf30da09745728f834b6f23d6631"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "96bb6f9849f2f4809e22b1bc2488cfb756177d65d5fd776dd7850b1042fb3c87"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "0dbb7cb2a5ce89208fb0d23193831fcaf661cf30da09745728f834b6f23d6631"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "96bb6f9849f2f4809e22b1bc2488cfb756177d65d5fd776dd7850b1042fb3c87"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "0dbb7cb2a5ce89208fb0d23193831fcaf661cf30da09745728f834b6f23d6631"
+    },
+    {
+      "shape": [
+        256,
+        512
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "ab0562a5cdf8ea9396adf5c0b1f4219c7b151d56eb6ed2f885ef58829f6a02d9"
+    },
+    {
+      "shape": [
+        256,
+        96
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "95f089c5528e3df60d218a3f7211fd1600b8794defe3c1e4c1a6c5b92e4948e6"
+    },
+    {
+      "shape": [
+        256,
+        96
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "e48f2e0a6435e14d89216d535cbd252bce304ad6352ed7369b7cfcfdeb85c06e"
+    },
+    {
+      "shape": [
+        256,
+        96
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "95f089c5528e3df60d218a3f7211fd1600b8794defe3c1e4c1a6c5b92e4948e6"
+    },
+    {
+      "shape": [
+        256,
+        160
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "29631e7ea6469bf798a39ea1ff073a15ac93ba39827f1ade7a394efce55a33d3"
+    },
+    {
+      "shape": [
+        256,
+        160
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "92744cb44c59fc5473d2c95a28e10ca410afa3b60598b125ba3a2cb9275af6c3"
+    },
+    {
+      "shape": [
+        256,
+        160
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "29631e7ea6469bf798a39ea1ff073a15ac93ba39827f1ade7a394efce55a33d3"
+    },
+    {
+      "shape": [
+        256,
+        96
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "95f089c5528e3df60d218a3f7211fd1600b8794defe3c1e4c1a6c5b92e4948e6"
+    },
+    {
+      "shape": [
+        256,
+        96
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "e48f2e0a6435e14d89216d535cbd252bce304ad6352ed7369b7cfcfdeb85c06e"
+    },
+    {
+      "shape": [
+        256,
+        96
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "95f089c5528e3df60d218a3f7211fd1600b8794defe3c1e4c1a6c5b92e4948e6"
+    },
+    {
+      "shape": [
+        256,
+        1024
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ]
+    },
+    {
+      "shape": [
+        256,
+        96
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "e48f2e0a6435e14d89216d535cbd252bce304ad6352ed7369b7cfcfdeb85c06e"
+    },
+    {
+      "shape": [
+        256,
+        96
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "95f089c5528e3df60d218a3f7211fd1600b8794defe3c1e4c1a6c5b92e4948e6"
+    },
+    {
+      "shape": [
+        256,
+        96
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "e48f2e0a6435e14d89216d535cbd252bce304ad6352ed7369b7cfcfdeb85c06e"
+    },
+    {
+      "shape": [
+        256,
+        96
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "95f089c5528e3df60d218a3f7211fd1600b8794defe3c1e4c1a6c5b92e4948e6"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        64
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "be96a07b36ba152892f4a6022ded429ec9b78d6683d6166e65558cd3639fac03"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "0dbb7cb2a5ce89208fb0d23193831fcaf661cf30da09745728f834b6f23d6631"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "96bb6f9849f2f4809e22b1bc2488cfb756177d65d5fd776dd7850b1042fb3c87"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "0dbb7cb2a5ce89208fb0d23193831fcaf661cf30da09745728f834b6f23d6631"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "96bb6f9849f2f4809e22b1bc2488cfb756177d65d5fd776dd7850b1042fb3c87"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "0dbb7cb2a5ce89208fb0d23193831fcaf661cf30da09745728f834b6f23d6631"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "96bb6f9849f2f4809e22b1bc2488cfb756177d65d5fd776dd7850b1042fb3c87"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "0dbb7cb2a5ce89208fb0d23193831fcaf661cf30da09745728f834b6f23d6631"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "96bb6f9849f2f4809e22b1bc2488cfb756177d65d5fd776dd7850b1042fb3c87"
+    },
+    {
+      "shape": [
+        256,
+        96
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "95f089c5528e3df60d218a3f7211fd1600b8794defe3c1e4c1a6c5b92e4948e6"
+    },
+    {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "a27b1f278686e73132a111f149f3a012d0c5c3ca6b324890ff12e061c7fea68e"
+    },
+    {
+      "shape": [
+        256,
+        256
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "903c999d53c86dc874efeff6c5da95b634c10d96b15cb23f3aa10508d8ac7f6e"
+    },
+    {
+      "shape": [
+        256,
+        96
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "e48f2e0a6435e14d89216d535cbd252bce304ad6352ed7369b7cfcfdeb85c06e"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "350cf019582f5e1aadab44db865a1faed52dabe450842362450fca3826467fbb"
+    },
+    {
+      "shape": [
+        256,
+        128
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "c448f4a7cc66da6fcfb9009a5fc124135e98daa4f7e9b5cb21c6359d578f98e2"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "0dbb7cb2a5ce89208fb0d23193831fcaf661cf30da09745728f834b6f23d6631"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "96bb6f9849f2f4809e22b1bc2488cfb756177d65d5fd776dd7850b1042fb3c87"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "0dbb7cb2a5ce89208fb0d23193831fcaf661cf30da09745728f834b6f23d6631"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "96bb6f9849f2f4809e22b1bc2488cfb756177d65d5fd776dd7850b1042fb3c87"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "0dbb7cb2a5ce89208fb0d23193831fcaf661cf30da09745728f834b6f23d6631"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "96bb6f9849f2f4809e22b1bc2488cfb756177d65d5fd776dd7850b1042fb3c87"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "0dbb7cb2a5ce89208fb0d23193831fcaf661cf30da09745728f834b6f23d6631"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "96bb6f9849f2f4809e22b1bc2488cfb756177d65d5fd776dd7850b1042fb3c87"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "0dbb7cb2a5ce89208fb0d23193831fcaf661cf30da09745728f834b6f23d6631"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "96bb6f9849f2f4809e22b1bc2488cfb756177d65d5fd776dd7850b1042fb3c87"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "0dbb7cb2a5ce89208fb0d23193831fcaf661cf30da09745728f834b6f23d6631"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "96bb6f9849f2f4809e22b1bc2488cfb756177d65d5fd776dd7850b1042fb3c87"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "0dbb7cb2a5ce89208fb0d23193831fcaf661cf30da09745728f834b6f23d6631"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "96bb6f9849f2f4809e22b1bc2488cfb756177d65d5fd776dd7850b1042fb3c87"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "0dbb7cb2a5ce89208fb0d23193831fcaf661cf30da09745728f834b6f23d6631"
+    },
+    {
+      "shape": [
+        256,
+        80
+      ],
+      "dtype": "float32",
+      "strides": [
+        33952,
+        1
+      ],
+      "pickle_sha256": "96bb6f9849f2f4809e22b1bc2488cfb756177d65d5fd776dd7850b1042fb3c87"
+    }
+  ],
+  "args": [
+    {
+      "t": 0
+    },
+    {
+      "t": 1
+    },
+    {
+      "t": 2
+    },
+    {
+      "t": 3
+    },
+    {
+      "t": 4
+    },
+    {
+      "t": 5
+    },
+    {
+      "t": 6
+    },
+    {
+      "t": 7
+    },
+    {
+      "t": 8
+    },
+    {
+      "t": 9
+    },
+    {
+      "t": 10
+    },
+    {
+      "t": 11
+    },
+    {
+      "t": 12
+    },
+    {
+      "t": 13
+    },
+    {
+      "t": 14
+    },
+    {
+      "t": 15
+    },
+    {
+      "t": 16
+    },
+    {
+      "t": 17
+    },
+    {
+      "t": 18
+    },
+    {
+      "t": 19
+    },
+    {
+      "t": 20
+    },
+    {
+      "t": 21
+    },
+    {
+      "t": 22
+    },
+    {
+      "t": 23
+    },
+    {
+      "t": 24
+    },
+    {
+      "t": 25
+    },
+    {
+      "t": 26
+    },
+    {
+      "t": 27
+    },
+    {
+      "t": 28
+    },
+    {
+      "t": 29
+    },
+    {
+      "t": 30
+    },
+    {
+      "t": 31
+    },
+    {
+      "t": 32
+    },
+    {
+      "t": 33
+    },
+    {
+      "t": 34
+    },
+    {
+      "t": 35
+    },
+    {
+      "t": 36
+    },
+    {
+      "t": 37
+    },
+    {
+      "t": 38
+    },
+    {
+      "t": 39
+    },
+    {
+      "t": 40
+    },
+    {
+      "t": 41
+    },
+    {
+      "t": 42
+    },
+    {
+      "t": 43
+    },
+    {
+      "t": 44
+    },
+    {
+      "t": 45
+    },
+    {
+      "t": 46
+    },
+    {
+      "t": 47
+    },
+    {
+      "t": 48
+    },
+    {
+      "t": 49
+    },
+    {
+      "t": 50
+    },
+    {
+      "t": 51
+    },
+    {
+      "t": 52
+    },
+    {
+      "t": 53
+    },
+    {
+      "t": 54
+    },
+    {
+      "t": 55
+    },
+    {
+      "t": 56
+    },
+    {
+      "t": 57
+    },
+    {
+      "t": 58
+    },
+    {
+      "t": 59
+    },
+    {
+      "t": 60
+    },
+    {
+      "t": 61
+    },
+    {
+      "t": 62
+    },
+    {
+      "t": 63
+    },
+    {
+      "t": 64
+    },
+    {
+      "t": 65
+    },
+    {
+      "t": 66
+    },
+    {
+      "t": 67
+    },
+    {
+      "t": 68
+    },
+    {
+      "t": 69
+    },
+    {
+      "t": 70
+    },
+    {
+      "t": 71
+    },
+    {
+      "t": 72
+    },
+    {
+      "t": 73
+    },
+    {
+      "t": 74
+    },
+    {
+      "t": 75
+    },
+    {
+      "t": 76
+    },
+    {
+      "t": 77
+    },
+    {
+      "t": 78
+    },
+    {
+      "t": 79
+    },
+    {
+      "t": 80
+    },
+    {
+      "t": 81
+    },
+    {
+      "t": 82
+    },
+    {
+      "t": 83
+    },
+    {
+      "t": 84
+    },
+    {
+      "t": 85
+    },
+    {
+      "t": 86
+    },
+    {
+      "t": 87
+    },
+    {
+      "t": 88
+    },
+    {
+      "t": 89
+    },
+    {
+      "t": 90
+    },
+    {
+      "t": 91
+    },
+    {
+      "t": 92
+    },
+    {
+      "t": 93
+    },
+    {
+      "t": 94
+    },
+    {
+      "t": 95
+    },
+    {
+      "t": 96
+    },
+    {
+      "t": 97
+    },
+    {
+      "t": 98
+    },
+    {
+      "t": 99
+    },
+    {
+      "t": 100
+    },
+    {
+      "t": 101
+    },
+    {
+      "t": 102
+    },
+    {
+      "t": 103
+    },
+    {
+      "t": 104
+    },
+    {
+      "t": 105
+    },
+    {
+      "t": 106
+    },
+    {
+      "t": 107
+    },
+    {
+      "t": 108
+    },
+    {
+      "t": 109
+    },
+    {
+      "t": 110
+    },
+    {
+      "t": 111
+    },
+    {
+      "t": 112
+    },
+    {
+      "t": 113
+    },
+    {
+      "t": 114
+    },
+    {
+      "t": 115
+    },
+    {
+      "t": 116
+    },
+    {
+      "t": 117
+    },
+    {
+      "t": 118
+    },
+    {
+      "t": 119
+    },
+    {
+      "t": 120
+    },
+    {
+      "t": 121
+    },
+    {
+      "t": 122
+    },
+    {
+      "t": 123
+    },
+    {
+      "t": 124
+    },
+    {
+      "t": 125
+    },
+    {
+      "t": 126
+    },
+    {
+      "t": 127
+    },
+    {
+      "t": 128
+    },
+    {
+      "t": 129
+    },
+    {
+      "t": 130
+    },
+    {
+      "t": 131
+    },
+    {
+      "t": 132
+    },
+    {
+      "t": 133
+    },
+    {
+      "t": 134
+    },
+    {
+      "t": 135
+    },
+    {
+      "t": 136
+    },
+    {
+      "t": 137
+    },
+    {
+      "t": 138
+    },
+    {
+      "t": 139
+    },
+    {
+      "t": 140
+    },
+    {
+      "t": 141
+    },
+    {
+      "t": 142
+    },
+    {
+      "t": 143
+    },
+    {
+      "t": 144
+    },
+    {
+      "t": 145
+    },
+    {
+      "t": 146
+    },
+    {
+      "t": 147
+    },
+    {
+      "t": 148
+    },
+    {
+      "t": 149
+    },
+    {
+      "t": 150
+    },
+    {
+      "t": 151
+    },
+    {
+      "t": 152
+    },
+    {
+      "t": 153
+    },
+    {
+      "t": 154
+    },
+    {
+      "t": 155
+    },
+    {
+      "t": 156
+    },
+    {
+      "t": 157
+    },
+    {
+      "t": 158
+    },
+    {
+      "t": 159
+    },
+    {
+      "t": 160
+    },
+    {
+      "t": 161
+    },
+    {
+      "t": 162
+    },
+    {
+      "t": 163
+    },
+    {
+      "t": 164
+    },
+    {
+      "t": 165
+    },
+    {
+      "t": 166
+    },
+    {
+      "t": 167
+    },
+    {
+      "t": 168
+    },
+    {
+      "t": 169
+    },
+    {
+      "t": 170
+    },
+    {
+      "t": 171
+    },
+    {
+      "t": 172
+    },
+    {
+      "t": 173
+    },
+    {
+      "t": 174
+    },
+    {
+      "t": 175
+    },
+    {
+      "t": 176
+    },
+    {
+      "t": 177
+    },
+    {
+      "t": 178
+    },
+    {
+      "t": 179
+    },
+    {
+      "t": 180
+    },
+    {
+      "t": 181
+    },
+    {
+      "t": 182
+    },
+    {
+      "t": 183
+    },
+    {
+      "t": 184
+    },
+    {
+      "t": 185
+    },
+    {
+      "t": 186
+    },
+    {
+      "t": 187
+    },
+    {
+      "t": 188
+    },
+    {
+      "t": 189
+    },
+    {
+      "t": 190
+    },
+    {
+      "t": 191
+    },
+    {
+      "t": 192
+    },
+    {
+      "t": 193
+    },
+    {
+      "t": 194
+    },
+    {
+      "t": 195
+    },
+    {
+      "t": 196
+    },
+    {
+      "t": 197
+    },
+    {
+      "t": 198
+    },
+    {
+      "t": 199
+    },
+    {
+      "t": 200
+    },
+    {
+      "t": 201
+    },
+    {
+      "t": 202
+    },
+    {
+      "t": 203
+    },
+    {
+      "t": 204
+    },
+    {
+      "t": 205
+    },
+    {
+      "t": 206
+    },
+    {
+      "t": 207
+    },
+    {
+      "t": 208
+    },
+    {
+      "t": 209
+    },
+    {
+      "t": 210
+    },
+    {
+      "t": 211
+    },
+    {
+      "t": 212
+    },
+    {
+      "t": 213
+    },
+    {
+      "t": 214
+    },
+    {
+      "t": 215
+    },
+    {
+      "t": 216
+    },
+    {
+      "t": 217
+    },
+    {
+      "t": 218
+    },
+    {
+      "t": 219
+    },
+    {
+      "t": 220
+    },
+    {
+      "t": 221
+    },
+    {
+      "t": 222
+    },
+    {
+      "t": 223
+    },
+    {
+      "t": 224
+    },
+    {
+      "t": 225
+    },
+    {
+      "t": 226
+    },
+    {
+      "t": 227
+    },
+    {
+      "t": 228
+    },
+    {
+      "t": 229
+    },
+    {
+      "t": 230
+    },
+    {
+      "t": 231
+    },
+    {
+      "t": 232
+    },
+    {
+      "t": 233
+    },
+    {
+      "t": 234
+    },
+    {
+      "t": 235
+    },
+    {
+      "t": 236
+    },
+    {
+      "t": 237
+    },
+    {
+      "t": 238
+    },
+    {
+      "t": 239
+    },
+    {
+      "t": 240
+    },
+    {
+      "t": 241
+    },
+    {
+      "t": 242
+    },
+    {
+      "t": 243
+    },
+    {
+      "t": 244
+    },
+    {
+      "t": 245
+    },
+    {
+      "t": 246
+    },
+    {
+      "t": 247
+    },
+    {
+      "t": 248
+    },
+    {
+      "t": 249
+    },
+    {
+      "null": true
+    },
+    {
+      "null": true
+    }
+  ],
+  "ptx_sha256": "b3e1bf481bb9d47fe5306c90e175d0ef8b78dde709ce5d1bee5847286f32677f",
+  "kernel_name": "triton_for_fused_4",
+  "fn_name": "triton_for_fused_4"
+}

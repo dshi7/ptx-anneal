@@ -1,0 +1,125 @@
+{
+  "entry": "triton_poi_fused_native_layer_norm_sigmoid_3",
+  "arch": "sm_100a",
+  "shared": 0,
+  "block": [
+    128,
+    1,
+    1
+  ],
+  "grid": [
+    38272,
+    1,
+    1
+  ],
+  "ptxas": "",
+  "ptxas_version": "13.3",
+  "tensors": [
+    {
+      "shape": [
+        299,
+        256,
+        512
+      ],
+      "dtype": "float32",
+      "strides": [
+        131072,
+        512,
+        1
+      ]
+    },
+    {
+      "shape": [
+        299,
+        256,
+        1
+      ],
+      "dtype": "float32",
+      "strides": [
+        256,
+        1,
+        1
+      ],
+      "pickle_sha256": "a44dab081a8c07338979595611a80f8bba9ff55c48f7b0199ef2b2984d2b9f97"
+    },
+    {
+      "shape": [
+        299,
+        256,
+        1
+      ],
+      "dtype": "float32",
+      "strides": [
+        256,
+        1,
+        1
+      ],
+      "pickle_sha256": "4bdf030b926123db1ee27e0c13bcd77b3164e2734c45a12fbdd31be44165f799"
+    },
+    {
+      "shape": [
+        512
+      ],
+      "dtype": "float32",
+      "strides": [
+        1
+      ],
+      "pickle_sha256": "08ba6f98f952a32b1c9048ce2134c398f0533de2543901e132504bd231dbe635"
+    },
+    {
+      "shape": [
+        512
+      ],
+      "dtype": "float32",
+      "strides": [
+        1
+      ],
+      "pickle_sha256": "a143ef1bc3f088ed88a7c791895ee54bebae88ac8794b4f7e2f6a5f5806bd378"
+    },
+    {
+      "shape": [
+        299,
+        256,
+        512
+      ],
+      "dtype": "float32",
+      "strides": [
+        131072,
+        512,
+        1
+      ]
+    }
+  ],
+  "args": [
+    {
+      "t": 0
+    },
+    {
+      "t": 1
+    },
+    {
+      "t": 2
+    },
+    {
+      "t": 3
+    },
+    {
+      "t": 4
+    },
+    {
+      "t": 5
+    },
+    {
+      "i32": 39190528
+    },
+    {
+      "null": true
+    },
+    {
+      "null": true
+    }
+  ],
+  "ptx_sha256": "6369baf64dbdbde01205648e149f4cce06ce1e77ea0360799c0349eafbd6ef52",
+  "kernel_name": "triton_poi_fused_native_layer_norm_sigmoid_3",
+  "fn_name": "triton_poi_fused_native_layer_norm_sigmoid_3"
+}

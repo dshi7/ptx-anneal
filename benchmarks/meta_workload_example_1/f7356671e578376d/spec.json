@@ -1,0 +1,149 @@
+{
+  "entry": "triton_per_fused_add_mul_native_layer_norm_native_layer_norm_backward_sigmoid_backward_9",
+  "arch": "sm_100a",
+  "shared": 81976,
+  "block": [
+    256,
+    1,
+    1
+  ],
+  "grid": [
+    16,
+    1,
+    1
+  ],
+  "ptxas": "",
+  "ptxas_version": "13.3",
+  "tensors": [
+    {
+      "shape": [
+        256,
+        2048
+      ],
+      "dtype": "float32",
+      "strides": [
+        2048,
+        1
+      ]
+    },
+    {
+      "shape": [
+        256,
+        2048
+      ],
+      "dtype": "float32",
+      "strides": [
+        2048,
+        1
+      ]
+    },
+    {
+      "shape": [
+        256,
+        1
+      ],
+      "dtype": "float32",
+      "strides": [
+        1,
+        1
+      ],
+      "pickle_sha256": "02439150340219a5be83368d4a9553992d005ce4d13ccfe7c558ae43b3b7d459"
+    },
+    {
+      "shape": [
+        256,
+        1
+      ],
+      "dtype": "float32",
+      "strides": [
+        1,
+        1
+      ],
+      "pickle_sha256": "251dec41a7004ad3bd50f5925e7f73acfe162b34134ef30017f695e053fc75e5"
+    },
+    {
+      "shape": [
+        256,
+        2048
+      ],
+      "dtype": "float32",
+      "strides": [
+        2048,
+        1
+      ]
+    },
+    {
+      "shape": [
+        256,
+        2048
+      ],
+      "dtype": "float32",
+      "strides": [
+        2048,
+        1
+      ]
+    },
+    {
+      "shape": [
+        256,
+        2048
+      ],
+      "dtype": "float32",
+      "strides": [
+        2048,
+        1
+      ]
+    },
+    {
+      "shape": [
+        65536
+      ],
+      "dtype": "float32",
+      "strides": [
+        1
+      ],
+      "pickle_sha256": "3404baacc03f48aa09fc1f7dd6f0fe410033c2c1344efd9e155011ffbef80ff6"
+    }
+  ],
+  "args": [
+    {
+      "t": 0
+    },
+    {
+      "t": 1
+    },
+    {
+      "t": 2
+    },
+    {
+      "t": 3
+    },
+    {
+      "t": 4
+    },
+    {
+      "t": 5
+    },
+    {
+      "t": 6
+    },
+    {
+      "t": 7
+    },
+    {
+      "i32": 256
+    },
+    {
+      "i32": 2048
+    },
+    {
+      "null": true
+    },
+    {
+      "null": true
+    }
+  ],
+  "ptx_sha256": "f7356671e578376d1e90381b31d033bc2a27384b3c8cb81a82ee8aef691e7a1f",
+  "kernel_name": "triton_per_fused_add_mul_native_layer_norm_native_layer_norm_backward_sigmoid_backward_9",
+  "fn_name": "triton_per_fused_add_mul_native_layer_norm_native_layer_norm_backward_sigmoid_backward_9"
+}
