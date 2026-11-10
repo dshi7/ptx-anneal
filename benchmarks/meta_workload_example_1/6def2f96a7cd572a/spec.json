@@ -1,0 +1,279 @@
+{
+  "entry": "triton_per_fused_mul_native_layer_norm_native_layer_norm_backward_17",
+  "arch": "sm_100a",
+  "shared": 16384,
+  "block": [
+    512,
+    1,
+    1
+  ],
+  "grid": [
+    16,
+    1,
+    1
+  ],
+  "ptxas": "",
+  "ptxas_version": "13.3",
+  "tensors": [
+    {
+      "shape": [
+        256,
+        12800
+      ],
+      "dtype": "bfloat16",
+      "strides": [
+        12800,
+        1
+      ]
+    },
+    {
+      "shape": [
+        256,
+        12800
+      ],
+      "dtype": "bfloat16",
+      "strides": [
+        12800,
+        1
+      ]
+    },
+    {
+      "shape": [
+        12800
+      ],
+      "dtype": "bfloat16",
+      "strides": [
+        1
+      ],
+      "pickle_sha256": "ed0a4a34f6966ca50d6a52deb3210344926844e215f22c4e7842a5365890a38c"
+    },
+    {
+      "shape": [
+        256,
+        12800
+      ],
+      "dtype": "bfloat16",
+      "strides": [
+        12800,
+        1
+      ]
+    },
+    {
+      "shape": [
+        256,
+        1
+      ],
+      "dtype": "float32",
+      "strides": [
+        1,
+        1
+      ],
+      "pickle_sha256": "f8cb6569eda4d87447c082d2006d014a528e60fee1c114c48b70230c7c4b6099"
+    },
+    {
+      "shape": [
+        256,
+        1
+      ],
+      "dtype": "float32",
+      "strides": [
+        1,
+        1
+      ],
+      "pickle_sha256": "b22920cb8215a2983fdb1fad01f5006cfe7a4def641ed3344557f79993156f0e"
+    },
+    {
+      "shape": [
+        256,
+        12800
+      ],
+      "dtype": "bfloat16",
+      "strides": [
+        12800,
+        1
+      ]
+    },
+    {
+      "shape": [
+        256,
+        12800
+      ],
+      "dtype": "bfloat16",
+      "strides": [
+        12800,
+        1
+      ]
+    },
+    {
+      "shape": [
+        256,
+        1
+      ],
+      "dtype": "float32",
+      "strides": [
+        1,
+        1
+      ],
+      "pickle_sha256": "a403ca771105311b1b1373f0d7d2a85471d93d82f4d06c9610dfe593fe3b6b88"
+    },
+    {
+      "shape": [
+        256,
+        1
+      ],
+      "dtype": "float32",
+      "strides": [
+        1,
+        1
+      ],
+      "pickle_sha256": "5c311e5b278a6a39f0719a1c7d3927142aee49e4468391795cb82ac4e41a4310"
+    },
+    {
+      "shape": [
+        256,
+        12800
+      ],
+      "dtype": "bfloat16",
+      "strides": [
+        12800,
+        1
+      ]
+    },
+    {
+      "shape": [
+        256,
+        12800
+      ],
+      "dtype": "bfloat16",
+      "strides": [
+        12800,
+        1
+      ]
+    },
+    {
+      "shape": [
+        256,
+        1
+      ],
+      "dtype": "float32",
+      "strides": [
+        1,
+        1
+      ],
+      "pickle_sha256": "eb2d34d70100958b095b5224feb115065786712013bba7446a2f5a1e3d4f6292"
+    },
+    {
+      "shape": [
+        256,
+        1
+      ],
+      "dtype": "float32",
+      "strides": [
+        1,
+        1
+      ],
+      "pickle_sha256": "2fed34a9ed69561186ec517d39f29e51304318df58febff4b2761571a7542dc3"
+    },
+    {
+      "shape": [
+        256,
+        1
+      ],
+      "dtype": "float32",
+      "strides": [
+        1,
+        256
+      ],
+      "pickle_sha256": "b1cda659206330330a3d4c77fd96b012c7920334ad40f208ad7a581285d97f25"
+    },
+    {
+      "shape": [
+        256,
+        1
+      ],
+      "dtype": "float32",
+      "strides": [
+        1,
+        256
+      ],
+      "pickle_sha256": "18f17ba610af319b527a72c87dfa4e0e51cd1d51bf497d844cb587031b5efe6d"
+    },
+    {
+      "shape": [
+        1228800
+      ],
+      "dtype": "float32",
+      "strides": [
+        1
+      ]
+    }
+  ],
+  "args": [
+    {
+      "t": 0
+    },
+    {
+      "t": 1
+    },
+    {
+      "t": 2
+    },
+    {
+      "t": 3
+    },
+    {
+      "t": 4
+    },
+    {
+      "t": 5
+    },
+    {
+      "t": 6
+    },
+    {
+      "t": 7
+    },
+    {
+      "t": 8
+    },
+    {
+      "t": 9
+    },
+    {
+      "t": 10
+    },
+    {
+      "t": 11
+    },
+    {
+      "t": 12
+    },
+    {
+      "t": 13
+    },
+    {
+      "t": 14
+    },
+    {
+      "t": 15
+    },
+    {
+      "t": 16
+    },
+    {
+      "i32": 256
+    },
+    {
+      "i32": 12800
+    },
+    {
+      "null": true
+    },
+    {
+      "null": true
+    }
+  ],
+  "ptx_sha256": "6def2f96a7cd572a85d1184a304ccc7872404ab1da8b98107333b11f4d4adbf0",
+  "kernel_name": "triton_per_fused_mul_native_layer_norm_native_layer_norm_backward_17",
+  "fn_name": "triton_per_fused_mul_native_layer_norm_native_layer_norm_backward_17"
+}

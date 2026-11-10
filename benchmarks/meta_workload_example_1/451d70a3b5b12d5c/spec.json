@@ -1,0 +1,120 @@
+{
+  "entry": "triton_red_fused_native_layer_norm_5",
+  "arch": "sm_100a",
+  "shared": 384,
+  "block": [
+    1024,
+    1,
+    1
+  ],
+  "grid": [
+    256,
+    1,
+    1
+  ],
+  "ptxas": "",
+  "ptxas_version": "13.3",
+  "tensors": [
+    {
+      "shape": [
+        256,
+        1
+      ],
+      "dtype": "float32",
+      "strides": [
+        1,
+        1
+      ],
+      "pickle_sha256": "b1f8868b5025e21b8e3bbca355e3be3cdfd99dd4662edd734198895d6f73e0bc"
+    },
+    {
+      "shape": [
+        256,
+        8448
+      ],
+      "dtype": "bfloat16",
+      "strides": [
+        8448,
+        1
+      ]
+    },
+    {
+      "shape": [
+        8448
+      ],
+      "dtype": "bfloat16",
+      "strides": [
+        1
+      ],
+      "pickle_sha256": "f2727d6521e659e0ef73f31cf19b828b3be68de1442afc1e425af08ce5ff1c44"
+    },
+    {
+      "shape": [
+        8448
+      ],
+      "dtype": "bfloat16",
+      "strides": [
+        1
+      ],
+      "pickle_sha256": "fa5ed80268f18d74db04dcac395a6993b0e1898ee0fd3928e3cd11607ddeff20"
+    },
+    {
+      "shape": [
+        256,
+        1
+      ],
+      "dtype": "float32",
+      "strides": [
+        1,
+        1
+      ],
+      "pickle_sha256": "b955b26d15508923bcd5f03b813088d7bed17c0c81a1d7d3a2a6084119ecc800"
+    },
+    {
+      "shape": [
+        256,
+        8448
+      ],
+      "dtype": "bfloat16",
+      "strides": [
+        8448,
+        1
+      ]
+    }
+  ],
+  "args": [
+    {
+      "t": 0
+    },
+    {
+      "t": 1
+    },
+    {
+      "t": 2
+    },
+    {
+      "t": 3
+    },
+    {
+      "t": 4
+    },
+    {
+      "t": 5
+    },
+    {
+      "i32": 256
+    },
+    {
+      "i32": 8448
+    },
+    {
+      "null": true
+    },
+    {
+      "null": true
+    }
+  ],
+  "ptx_sha256": "451d70a3b5b12d5c39874a27ec58c01cca0e269ccfd36db99a811f1a83c0c6b2",
+  "kernel_name": "triton_red_fused_native_layer_norm_5",
+  "fn_name": "triton_red_fused_native_layer_norm_5"
+}

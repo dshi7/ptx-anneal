@@ -1,0 +1,69 @@
+{
+  "entry": "triton_red_fused_sum_5",
+  "arch": "sm_100a",
+  "shared": 1024,
+  "block": [
+    256,
+    1,
+    1
+  ],
+  "grid": [
+    2392,
+    1,
+    1
+  ],
+  "ptxas": "",
+  "ptxas_version": "13.3",
+  "tensors": [
+    {
+      "shape": [
+        299,
+        256,
+        512
+      ],
+      "dtype": "float32",
+      "strides": [
+        131072,
+        512,
+        1
+      ]
+    },
+    {
+      "shape": [
+        299,
+        1,
+        512
+      ],
+      "dtype": "float32",
+      "strides": [
+        512,
+        512,
+        1
+      ],
+      "pickle_sha256": "675eca118ca9529b04470d8cd4ba915a6e15cc24e0823fd6ed3133bf480fb819"
+    }
+  ],
+  "args": [
+    {
+      "t": 0
+    },
+    {
+      "t": 1
+    },
+    {
+      "i32": 153088
+    },
+    {
+      "i32": 256
+    },
+    {
+      "null": true
+    },
+    {
+      "null": true
+    }
+  ],
+  "ptx_sha256": "a9f336a37daf27923c579492d14bfc5b100c7509a28992c600aeda377b03a5eb",
+  "kernel_name": "triton_red_fused_sum_5",
+  "fn_name": "triton_red_fused_sum_5"
+}

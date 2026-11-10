@@ -1,0 +1,75 @@
+{
+  "entry": "triton_poi_fused_mul_sigmoid_1",
+  "arch": "sm_100a",
+  "shared": 0,
+  "block": [
+    128,
+    1,
+    1
+  ],
+  "grid": [
+    1594,
+    1,
+    1
+  ],
+  "ptxas": "",
+  "ptxas_version": "13.3",
+  "tensors": [
+    {
+      "shape": [
+        256,
+        6376
+      ],
+      "dtype": "float32",
+      "strides": [
+        6376,
+        1
+      ]
+    },
+    {
+      "shape": [
+        256,
+        6376
+      ],
+      "dtype": "float32",
+      "strides": [
+        6400,
+        1
+      ]
+    },
+    {
+      "shape": [
+        256,
+        6376
+      ],
+      "dtype": "float32",
+      "strides": [
+        6400,
+        1
+      ]
+    }
+  ],
+  "args": [
+    {
+      "t": 0
+    },
+    {
+      "t": 1
+    },
+    {
+      "t": 2
+    },
+    {
+      "i32": 1632256
+    },
+    {
+      "null": true
+    },
+    {
+      "null": true
+    }
+  ],
+  "ptx_sha256": "1c29ebe92727be54c1da0d1bd1ec718517b16e43c5cb78c9d6ff27c663e24d91",
+  "kernel_name": "triton_poi_fused_mul_sigmoid_1",
+  "fn_name": "triton_poi_fused_mul_sigmoid_1"
+}
