@@ -8,9 +8,71 @@ These pin the two rules that are easy to "simplify" into a regression:
   2. with nothing pinned, a candidate that MEETS the floor beats one that is merely found first.
 """
 
+import ctypes
 import os
+from types import SimpleNamespace
+
+import pytest
 
 from ptx_anneal import provision
+
+
+@pytest.fixture
+def cuda_driver(monkeypatch):
+    driver = SimpleNamespace(count=4, init_status=0, count_status=0)
+    driver.cuInit = lambda flags: driver.init_status
+
+    def device_count(pointer):
+        ctypes.cast(pointer, ctypes.POINTER(ctypes.c_int)).contents.value = driver.count
+        return driver.count_status
+
+    driver.cuDeviceGetCount = device_count
+    monkeypatch.setattr(provision.ctypes, "CDLL", lambda library: driver)
+    return driver
+
+
+@pytest.mark.parametrize(
+    ("visible", "count", "expected"),
+    [
+        (None, 4, ["0", "1", "2", "3"]),
+        (None, 1, ["0"]),
+        (None, 0, []),
+        ("3, 7", 2, ["3", "7"]),
+        ("GPU-abc,MIG-def", 2, ["GPU-abc", "MIG-def"]),
+        ("3,-1,7", 1, ["3"]),
+        ("", 0, []),
+        ("-1", 0, []),
+    ],
+)
+def test_visible_gpu_probe_respects_cuda_enumeration(cuda_driver, monkeypatch, visible, count, expected):
+    cuda_driver.count = count
+    if visible is None:
+        monkeypatch.delenv("CUDA_VISIBLE_DEVICES", raising=False)
+    else:
+        monkeypatch.setenv("CUDA_VISIBLE_DEVICES", visible)
+    assert provision.visible_gpus() == expected
+    assert os.environ.get("CUDA_VISIBLE_DEVICES") == visible
+
+
+def test_visible_gpu_probe_no_device(cuda_driver):
+    cuda_driver.init_status = 100
+    assert provision.visible_gpus() == []
+
+
+@pytest.mark.parametrize("failure", ["init_status", "count_status"])
+def test_visible_gpu_probe_reports_driver_errors(cuda_driver, failure):
+    setattr(cuda_driver, failure, 999)
+    with pytest.raises(RuntimeError, match="CUDA GPU discovery: .*error 999"):
+        provision.visible_gpus()
+
+
+def test_visible_gpu_probe_missing_driver(monkeypatch):
+    def unavailable(library):
+        raise OSError("missing libcuda")
+
+    monkeypatch.setattr(provision.ctypes, "CDLL", unavailable)
+    with pytest.raises(RuntimeError, match="working NVIDIA driver"):
+        provision.visible_gpus()
 
 
 def _fake_ptxas(tmp_path, name, version):

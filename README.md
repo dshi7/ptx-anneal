@@ -40,17 +40,51 @@ records which one produced it (`resolved_tag` + `sha256`) in its `.acf.json` sid
 ptxas version and the engine build (`engine_info`) — so a result stays explainable after the catalog
 moves on. Pin `CIQ_SS_TAG` for reproducible runs.
 
-For a task stored on Manifold, add `--upload-manifold` to upload the admitted ACF and its
-`.acf.json` provenance sidecar back to that task directory:
+Artifacts are grouped by architecture and the first 16 characters of the normalized PTX hash
+(`hash16`). With `--output store`, an admitted ACF and its sidecar are saved as:
 
-```bash
-ptx_anneal --task manifold://<bucket>/<task_directory> --upload-manifold
+```text
+store/sm_100a/<hash16>/
+  <hash16>.13.3.acf
+  <hash16>.13.3.acf.json
 ```
 
-The files keep their version-tagged names under a new `compileiq_YYYYmmddHHMMSS` subdirectory
-(UTC, at upload time). This tuning-only flag requires a `manifold://` task directory. If no ACF
-is admitted, upload is skipped. An upload failure exits nonzero and preserves the local ACF
-and sidecar so they can be recovered without rerunning the search.
+The sidecar retains the full PTX hash. Different ptxas versions coexist in the same kernel
+directory. `LocalStore` also reads older full-hash directories and flat stores, preferring
+the short nested artifact when both exist. Consumers that construct file paths directly must
+use the 16-character nested layout to find newly written ACFs. The default root
+remains `$COMPILE_IQ_STORE` or `~/.compile_iq/store`; `--output` selects a different root.
+
+For a task stored on Manifold under `tasks/<task-id>`, add `--upload-manifold` to publish
+its store subtree under the run's sibling `store` directory:
+
+```bash
+python -m ptx_anneal.cli --task 'manifold://<bucket>/<run>/tasks/<task-id>' --upload-manifold
+```
+
+The destination is `manifold://<bucket>/<run>/store/<arch>/<hash16>/`, with no task-ID directory.
+It preserves the local store layout and includes this kernel's versioned ACFs, their
+`.acf.json` provenance sidecars and any cached `.acf.cubin` files. Other kernels in the
+local store are excluded. Repeated uploads update the same destination files.
+This tuning-only flag validates the `tasks/<task-id>` URL before downloading the task.
+If no ACF is admitted, upload is skipped. An upload failure exits nonzero and preserves
+the local store files so they can be recovered without rerunning the search.
+
+To tune every task under a Manifold directory, use `--task-list` in place of `--task`:
+
+```bash
+python -m ptx_anneal.cli --task-list 'manifold://<bucket>/<run>/tasks' \
+  --full-tune --output store --upload-manifold
+```
+
+Discovery recursively finds directories containing both `kernel.ptx` and `spec.json`,
+then tunes them in sorted URL order. Each task runs in a separate process, one at a time;
+`--full-tune` uses all visible GPUs for candidate scoring within each task. All tuning
+options apply to every task. With `--upload-manifold`, each task URL must end in
+`tasks/<task-id>`, and results go to that run's `store/<arch>/<hash16>/` directory.
+Failures are reported while the remaining tasks continue. The final summary counts completed
+and failed tasks; the command exits nonzero if any task fails or no tasks are found.
+Completion does not imply an ACF was admitted. This option is for tuning only.
 
 Step 3. ACF consumption: On an ACF-store hit, re-assemble the kernel with the ACF (ptxas --apply-controls) and run the tuned SASS.
 ```bash
@@ -168,6 +202,50 @@ contiguous tensors use cuda-python + NumPy. BF16, TMA and strided tensors use th
 PTX scorer (install `.[harness,cudapy]` from the checkout); TMA captures need the matching Triton
 descriptor encoder. Both paths check candidate outputs against an untuned run before timing,
 honor `--bench`, and use the selected `--ptxas` instead of a captured machine-specific path.
+
+To score candidates from one search on multiple GPUs on the same host:
+
+```bash
+CUDA_VISIBLE_DEVICES=0,1,2,3 ptx-anneal --task <task_dir> --workers 4
+```
+
+`--workers N` (or `PTX_ANNEAL_NUM_WORKERS=N`) enables CompileIQ's native multiprocessing
+with the first N devices from an explicit `CUDA_VISIBLE_DEVICES` list. GPU ordinals and UUIDs
+are supported. The default is one worker and the usual CUDA device selection. Each candidate
+leases one GPU and its `_score` subprocess sees only that device; the lease is released after
+the subprocess exits, including when `CIQ_TASK_TIMEOUT` kills it. Candidate counts are shared
+across workers, and candidate logs include the assigned GPU. No Ray cluster is needed.
+
+Use GPUs of the same model with comparable clocks: the engine ranks raw timings from all
+devices. After parallel search, the CLI revalidates and remeasures the winner on the original
+baseline GPU before deciding whether to admit it. The sidecar records both `search_best_ms`
+and the final `best_ms`, plus the worker count and GPU list in `budget`. `CIQ_POOL` controls
+the search population; it does not select devices or the worker count.
+
+Search budget defaults are `CIQ_GENERATIONS=1`, `CIQ_POOL=8`, and `CIQ_CULL=4`.
+Use `--full-tune` for **20 generations, pool size 32, and cull size 24**, overriding
+all three environment values for that run. It also probes the CUDA driver and uses
+**all visible GPUs**, one worker per GPU:
+
+```bash
+ptx-anneal --task <task_dir> --full-tune
+```
+
+GPU discovery honors `CUDA_VISIBLE_DEVICES` and CUDA device order. Without a visibility
+restriction it uses every device CUDA enumerates; an empty device list or a failed probe
+stops the run before scoring. `--full-tune` overrides `PTX_ANNEAL_NUM_WORKERS` with the
+discovered count; an explicit `--workers N` caps concurrency to the first N discovered GPUs.
+
+For a custom budget, omit `--full-tune` and set the environment values, for example:
+
+```bash
+CIQ_GENERATIONS=5 CIQ_POOL=32 CIQ_CULL=8 ptx-anneal --task <task_dir>
+```
+
+`CIQ_POOL=0` retains the engine-selected pool size. `CIQ_CULL` is forwarded as
+`SearchConfiguration.cull_size` and recorded in the result's `budget`. CompileIQ 1.1
+deprecates and ignores `cull_size`; setting it only controls culling on engine versions
+that support that setting.
 
 ```
 ptx_anneal --task ──> baseline score (in-process)

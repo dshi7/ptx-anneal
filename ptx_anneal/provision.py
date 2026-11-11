@@ -24,6 +24,7 @@ with the bundled adapter -- it only reports the plugin registry.
 
 from __future__ import annotations
 
+import ctypes
 import os
 import re
 import shutil
@@ -112,6 +113,33 @@ def min_ptxas() -> str:
     hashes to a different store key -- a lower floor would silently produce ACFs nothing can consume.
     """
     return MIN_PTXAS
+
+
+def visible_gpus() -> list[str]:
+    """Probe CUDA-visible devices for tuning, without importing torch or cuda-python.
+
+    CUDA applies CUDA_VISIBLE_DEVICES and CUDA_DEVICE_ORDER during initialization. Preserve
+    that order and the caller's device identifiers when pinning fresh scorer subprocesses.
+    This initializes the driver, so only tuning invokes it; doctor remains best-effort.
+    """
+    try:
+        driver = ctypes.CDLL("nvcuda.dll" if os.name == "nt" else "libcuda.so.1")
+        status = driver.cuInit(0)
+        if status == 100:  # CUDA_ERROR_NO_DEVICE
+            return []
+        if status != 0:
+            raise RuntimeError(f"CUDA GPU discovery: cuInit failed with error {status}")
+        count = ctypes.c_int()
+        status = driver.cuDeviceGetCount(ctypes.byref(count))
+    except (OSError, AttributeError) as e:
+        raise RuntimeError(f"CUDA GPU discovery requires a working NVIDIA driver: {e}") from e
+    if status != 0:
+        raise RuntimeError(f"CUDA GPU discovery: cuDeviceGetCount failed with error {status}")
+    visible = os.environ.get("CUDA_VISIBLE_DEVICES")
+    if visible is None:
+        return [str(index) for index in range(count.value)]
+    # CUDA stops enumeration at an invalid entry (including -1). Use only the prefix it found.
+    return [gpu.strip() for gpu in visible.split(",")][: count.value]
 
 
 def gpu_status() -> dict:

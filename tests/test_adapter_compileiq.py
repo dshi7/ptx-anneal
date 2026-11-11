@@ -11,10 +11,13 @@ never needs the real engine (which is >=3.11,<3.14 + glibc 2.34) to cover this l
 import hashlib
 import importlib.util
 import json
+import multiprocessing
+import os
 import shutil
 import subprocess
 import sys
 import types
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
 import pytest
@@ -330,3 +333,176 @@ def test_search_metric_protocol_and_zero_winner(fake_compileiq, monkeypatch, tmp
     if metric == "spill_bytes":
         assert "best_ms" not in result
         assert result["budget"]["warmup"] is None and result["budget"]["rep"] is None
+
+
+@pytest.mark.parametrize("visible", ["", "0", "0,0", "0,00", "0,", "-1,0", "all", "0,1,-1"])
+def test_parallel_workers_require_explicit_distinct_devices(monkeypatch, visible):
+    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", visible)
+    with pytest.raises(ValueError, match="CUDA_VISIBLE_DEVICES"):
+        _load_adapter()._worker_gpus(2)
+
+
+def test_workers_respect_visible_device_order(monkeypatch):
+    mod = _load_adapter()
+    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", " 3, 7, 5 ")
+    assert mod._worker_gpus(2) == ["3", "7"]
+    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "GPU-abc,GPU-def")
+    assert mod._worker_gpus(2) == ["GPU-abc", "GPU-def"]
+    monkeypatch.delenv("CUDA_VISIBLE_DEVICES")
+    assert mod._worker_gpus(1) == []
+    with pytest.raises(ValueError, match="positive"):
+        mod._worker_gpus(0)
+
+
+@pytest.fixture
+def scorer_script(tmp_path):
+    """CPU substitute for _score: records device affinity and detects overlapping use of a GPU."""
+    script = tmp_path / "score.py"
+    script.write_text("""\
+import json
+import os
+from pathlib import Path
+import sys
+import time
+
+root, mode = Path(sys.argv[1]), sys.argv[2]
+acf_path = Path(sys.argv[sys.argv.index("--acf") + 1])
+acf = acf_path.read_bytes().hex()
+gpu = os.environ.get("CUDA_VISIBLE_DEVICES", "unset")
+(root / f"input-{acf}.json").write_text(json.dumps({"pid": os.getpid(), "path": str(acf_path), "gpu": gpu}))
+if mode == "timeout":
+    time.sleep(30)
+if mode == "invalid":
+    print("INVALID")
+    sys.exit(0)
+if mode == "crash":
+    print("MS 1.0")
+    sys.exit(2)
+if mode == "parallel":
+    lease = root / f"busy-{gpu}"
+    # Exclusive creation fails if two scorers receive the same GPU concurrently.
+    with lease.open("x"):
+        (root / f"ready-{gpu}").touch()
+        deadline = time.monotonic() + 10
+        while len(list(root.glob("ready-*"))) < 2:
+            if time.monotonic() > deadline:
+                raise RuntimeError("scorers did not run on two GPUs concurrently")
+            time.sleep(0.01)
+        time.sleep(0.05)
+    lease.unlink()
+print("MS 1.0")
+""")
+    return [sys.executable, str(script), str(tmp_path)]
+
+
+def _score_in_process(scorer, acf, barrier):
+    """Transfer the actual objective and its manager proxies through spawn/forkserver serialization."""
+    barrier.wait(timeout=20)
+    return scorer(acf)
+
+
+@pytest.mark.parametrize("start_method", ["spawn", "forkserver"])
+def test_gpu_leases_and_counts_cross_processes(monkeypatch, scorer_script, tmp_path, start_method):
+    mod = importlib.import_module(ADAPTER)
+    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "3,7")
+    with mod._scoring_state(["3", "7"]) as state, multiprocessing.Manager() as manager:
+        barrier = manager.Barrier(4)
+        scorer = mod._CandidateScorer([*scorer_script, "parallel"], 15, *state, float("inf"))
+        with ProcessPoolExecutor(max_workers=4, mp_context=multiprocessing.get_context(start_method)) as pool:
+            futures = [pool.submit(_score_in_process, scorer, f"{i:02x}", barrier) for i in range(4)]
+            assert [future.result(timeout=30) for future in futures] == [1.0] * 4
+        available, counts, _ = state
+        assert dict(counts) == {"n": 4, "valid": 4, "timeout": 0}
+        assert {available.get_nowait(), available.get_nowait()} == {"3", "7"}
+    records = [json.loads(path.read_text()) for path in tmp_path.glob("input-*.json")]
+    assert {record["gpu"] for record in records} == {"3", "7"}
+    assert all(not Path(record["path"]).exists() for record in records)
+    assert os.environ["CUDA_VISIBLE_DEVICES"] == "3,7"
+
+
+@pytest.mark.parametrize("mode", ["timeout", "invalid", "crash"])
+def test_failed_scorer_releases_gpu_and_cleans_acf(scorer_script, tmp_path, mode):
+    mod = _load_adapter()
+    with mod._scoring_state(["7"]) as state:
+        scorer = mod._CandidateScorer([*scorer_script, mode], 1, *state, float("inf"))
+        assert scorer("00") == float("inf")
+        record = json.loads((tmp_path / "input-00.json").read_text())
+        assert not Path(record["path"]).exists()
+        with pytest.raises(ProcessLookupError):
+            os.kill(record["pid"], 0)  # Child must be dead/reaped before the GPU is reused.
+        scorer.command = [*scorer_script, "ok"]
+        assert scorer("01") == 1.0
+        assert dict(state[1]) == {"n": 2, "valid": 1, "timeout": int(mode == "timeout")}
+        assert state[0].get_nowait() == "7"
+
+
+def test_serial_scorer_preserves_cuda_visibility(monkeypatch, scorer_script, tmp_path):
+    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "5,3")
+    mod = _load_adapter()
+    with mod._scoring_state([]) as state:
+        assert mod._CandidateScorer([*scorer_script, "ok"], 5, *state, float("inf"))("00") == 1.0
+    assert json.loads((tmp_path / "input-00.json").read_text())["gpu"] == "5,3"
+
+
+@pytest.mark.parametrize("workers", [1, 2])
+@pytest.mark.parametrize("engine_fails", [False, True])
+@pytest.mark.parametrize(
+    ("pool_env", "cull_env", "expected_pool", "expected_cull"),
+    [(None, None, 8, 4), ("16", "6", 16, 6), ("0", "4", None, 4)],
+)
+def test_adapter_search_wiring_and_shared_results(
+    fake_compileiq, monkeypatch, tmp_path, workers, engine_fails, pool_env, cull_env, expected_pool, expected_cull
+):
+    mod = _load_adapter()
+    monkeypatch.setenv("PTX_ANNEAL_SCORE_CMD", json.dumps([sys.executable, "-c", "print('MS 1.0')"]))
+    monkeypatch.setenv("PTX_ANNEAL_TASK", str(tmp_path))
+    monkeypatch.setenv("PTX_ANNEAL_PTXAS", "unused")
+    monkeypatch.setenv("PTX_ANNEAL_RESULT", str(tmp_path / "result.json"))
+    monkeypatch.setenv("PTX_ANNEAL_NUM_WORKERS", str(workers))
+    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "3,7")
+    monkeypatch.setenv("CIQ_TASK_TIMEOUT", "5")
+    monkeypatch.setenv("CIQ_GENERATIONS", "3")
+    for name, value in (("CIQ_POOL", pool_env), ("CIQ_CULL", cull_env)):
+        if value is None:
+            monkeypatch.delenv(name, raising=False)
+        else:
+            monkeypatch.setenv(name, value)
+    monkeypatch.delenv("CIQ_CLOCK_MHZ", raising=False)
+    monkeypatch.delenv("PTX_ANNEAL_SS", raising=False)
+    calls = {}
+
+    class Search:
+        def __init__(self, **kwargs):
+            calls.update(kwargs)
+
+        def start(self, **kwargs):
+            calls["start"] = kwargs
+            assert calls["objective_function"]("00") == 1.0
+            if engine_fails:
+                raise RuntimeError("engine failed after candidate")
+            return types.SimpleNamespace(
+                get_results=lambda: [1], get_best_result=lambda: {"params": "00", "score_1": 1.0}
+            )
+
+    sys.modules["compileiq.ciq"].Search = Search
+    engine_types = types.ModuleType("compileiq.types")
+    engine_types.SearchConfiguration = lambda **kw: kw
+    engine_types.INVALID_SCORE = float("inf")
+    engine_types.WorkerTypes = types.SimpleNamespace(NATIVE="native")
+    monkeypatch.setitem(sys.modules, "compileiq.types", engine_types)
+    assert mod.main() == 0
+    payload = json.loads((tmp_path / "result.json").read_text())
+    assert payload["valid"] == 1 and payload["evaluated"] == 1 and payload["timeout"] == 0
+    assert bool(payload["engine_error"]) == engine_fails
+    assert payload["budget"]["num_workers"] == workers
+    assert payload["budget"]["gpus"] == (["3", "7"] if workers == 2 else [])
+    assert calls["search_config"] == {
+        "problem_type": "min",
+        "generations": 3,
+        "pool_size": expected_pool,
+        "cull_size": expected_cull,
+    }
+    assert payload["budget"]["pool_size"] == expected_pool
+    assert payload["budget"]["cull_size"] == expected_cull
+    assert calls["start"] == ({"task_timeout": 10, "num_workers": 2} if workers == 2 else {"task_timeout": 10})
+    assert calls.get("worker_type") == ("native" if workers == 2 else None)
