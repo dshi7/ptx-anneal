@@ -47,7 +47,7 @@ import tempfile
 from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from pathlib import Path
 from urllib.parse import urlsplit
 
 SPEC_VERSION = 1
@@ -109,24 +109,95 @@ def local_task_dir(task_dir: str | os.PathLike[str]) -> Iterator[str]:
         yield local_dir
 
 
-def upload_acf(task_dir: str, acf_path: str) -> str:
-    """Upload an admitted ACF and its provenance to a new UTC-stamped task subdirectory.
-
-    Local artifacts are retained on failure. Return the uploaded ACF URL only after both files
-    have been uploaded successfully.
-    """
+def manifold_store_url(task_dir: str) -> str:
+    """Map a captured task's ``.../tasks/<id>`` URL to the run's sibling ``.../store``."""
     source = _manifold_task_path(task_dir)
+    parts = source.split("/")
+    if len(parts) < 4 or parts[-2] != "tasks" or any(part in ("", ".", "..") for part in parts):
+        raise TaskError("--upload-manifold requires --task manifold://<bucket>/<run>/tasks/<task-id>")
+    return "manifold://" + "/".join([*parts[:-2], "store"])
+
+
+def manifold_tasks(task_list: str) -> list[str]:
+    """Recursively discover task directories containing both spec.json and kernel.ptx.
+
+    Use the external CLI for discovery, then download one task at a time during tuning. Sorting
+    and deduplicating the URLs makes the run order independent of Manifold's listing order.
+    """
+    source = _manifold_task_path(task_list)
+    if any(part in ("", ".", "..") for part in source.split("/")):
+        raise TaskError(f"invalid Manifold task-list directory: {task_list!r}")
+    manifold = shutil.which("manifold")
+    if not manifold:
+        raise TaskError("--task-list requires the 'manifold' CLI on PATH")
+    try:
+        result = subprocess.run(
+            [manifold, "find", source, r"^(spec\.json|kernel\.ptx)$", "--regex", "--type", "f"],
+            capture_output=True,
+            text=True,
+            timeout=600,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError) as e:
+        raise TaskError(f"failed to list tasks under {task_list}: {e}") from e
+    if result.returncode != 0:
+        detail = result.stderr.strip() or result.stdout.strip()
+        raise TaskError(f"failed to list tasks under {task_list} (exit {result.returncode}): {detail}")
+    files: dict[str, set[str]] = {}
+    for line in result.stdout.splitlines():
+        path = line.strip().removeprefix("manifold://")
+        if not path:
+            continue
+        parent, _, filename = path.rpartition("/")
+        if (
+            not path.startswith(source + "/")
+            or any(part in ("", ".", "..") for part in path.split("/"))
+            or filename not in ("spec.json", "kernel.ptx")
+        ):
+            raise TaskError(f"unexpected Manifold task-list entry: {line!r}")
+        files.setdefault(parent, set()).add(filename)
+    tasks = sorted("manifold://" + parent for parent, names in files.items() if names == {"spec.json", "kernel.ptx"})
+    if not tasks:
+        raise TaskError(f"no tasks containing spec.json and kernel.ptx found under {task_list}")
+    return tasks
+
+
+def upload_store(task_dir: str, store_root: str, acf_path: str) -> str:
+    """Publish this task's store subtree under ``.../store/<arch>/<hash16>/``.
+
+    Include all versioned ACFs, their provenance and optional cubins for this kernel, preserving
+    paths relative to the store root. Other kernels and temporary files are not part of this task's
+    upload. Return the remote store URL after every upload succeeds; retain local files on failure.
+    """
+    destination = manifold_store_url(task_dir)
     manifold = shutil.which("manifold")
     if not manifold:
         raise TaskError("--upload-manifold requires the 'manifold' CLI on PATH")
-    files = (acf_path, acf_path + ".json")
-    for path in files:
-        if not os.path.isfile(path):
-            raise TaskError(f"cannot upload ACF: missing local file {path}")
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
-    destination = f"{source}/compileiq_{stamp}"
-    commands = [[manifold, "mkdir", destination]]
-    commands += [[manifold, "put", path, f"{destination}/{os.path.basename(path)}"] for path in files]
+    root, acf = Path(store_root).resolve(), Path(acf_path).resolve()
+    try:
+        relative_dir = acf.parent.relative_to(root)
+    except ValueError as e:
+        raise TaskError(f"cannot upload store: ACF {acf} is outside {root}") from e
+    if len(relative_dir.parts) != 2 or not acf.name.startswith(relative_dir.name + ".") or acf.suffix != ".acf":
+        raise TaskError("cannot upload store: expected <store>/<arch>/<ir_hash>/<ir_hash>[.<ptxas>].acf")
+    if not acf.is_file():
+        raise TaskError(f"cannot upload store: missing local file {acf}")
+    files = []
+    for artifact in sorted(acf.parent.iterdir()):
+        if not artifact.name.startswith(relative_dir.name + ".") or artifact.suffix != ".acf":
+            continue
+        sidecar = Path(str(artifact) + ".json")
+        for path in (artifact, sidecar):
+            if not path.is_file():
+                raise TaskError(f"cannot upload store: missing local file {path}")
+            files.append(path)
+        cubin = Path(str(artifact) + ".cubin")
+        if cubin.is_file():
+            files.append(cubin)
+    remote_dir = f"{destination.removeprefix('manifold://')}/{relative_dir.as_posix()}"
+    # Idempotent directory creation and file replacement let later tuning runs refresh the store.
+    commands = [[manifold, "mkdir", "-p", remote_dir]]
+    commands += [[manifold, "put", "--overwrite", str(path), f"{remote_dir}/{path.name}"] for path in files]
     for command in commands:
         try:
             result = subprocess.run(command, capture_output=True, text=True, timeout=120, check=False)
@@ -137,7 +208,7 @@ def upload_acf(task_dir: str, acf_path: str) -> str:
             raise TaskError(
                 f"Manifold {command[1]} failed for manifold://{command[-1]} (exit {result.returncode}): {detail}"
             )
-    return f"manifold://{destination}/{os.path.basename(acf_path)}"
+    return destination
 
 
 def default_task_root() -> str:

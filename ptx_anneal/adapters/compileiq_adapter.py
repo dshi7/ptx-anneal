@@ -15,7 +15,9 @@ Contract (all via env, set by the harness):
     PTX_ANNEAL_SS          search-space .bin (OPTIONAL -- unset means "fetch the published catalog")
     PTX_ANNEAL_RESULT      path to write the result JSON to
     PTX_ANNEAL_WARMUP / PTX_ANNEAL_REP   benchmark iters (optional)
-    CIQ_GENERATIONS / CIQ_POOL           engine budget (optional)
+    PTX_ANNEAL_NUM_WORKERS              native workers (default 1); multiple workers require
+                                        an explicit CUDA_VISIBLE_DEVICES list, one GPU per worker
+    CIQ_GENERATIONS / CIQ_POOL / CIQ_CULL engine budget (defaults 1 / 8 / 4)
     CIQ_TASK_TIMEOUT                     per-candidate timeout, seconds (optional; unset = no timeout)
     CIQ_CLOCK_MHZ / CIQ_CLOCK_SUDO       lock GPU clocks around the search (optional; unset = don't touch)
     CIQ_SS_VERSION / CIQ_SS_VARIANT / CIQ_SS_TAG   catalog selector, when PTX_ANNEAL_SS is unset
@@ -45,6 +47,7 @@ import contextlib
 import hashlib
 import json
 import math
+import multiprocessing
 import os
 import re
 import shlex
@@ -52,6 +55,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import threading
 
 # Slack between our per-candidate kill and the engine's own task_timeout, so the two cannot fire at
 # the same moment and leave a candidate abandoned rather than cleanly recorded as invalid.
@@ -62,6 +66,113 @@ def _env_num(name: str, cast):
     """Read an optional numeric knob. Unset or empty means "not requested", not "zero"."""
     raw = os.environ.get(name, "").strip()
     return cast(raw) if raw else None
+
+
+def _worker_gpus(num_workers: int) -> list[str]:
+    """Use the first N explicitly visible devices; never discover outside the caller's allocation."""
+    if num_workers < 1:
+        raise ValueError("PTX_ANNEAL_NUM_WORKERS must be positive")
+    if num_workers == 1:
+        return []  # Preserve ordinary CUDA device selection for the default serial path.
+    visible = os.environ.get("CUDA_VISIBLE_DEVICES", "")
+    gpus = [gpu.strip() for gpu in visible.split(",")]
+    gpus = [str(int(gpu)) if re.fullmatch(r"[0-9]+", gpu) else gpu for gpu in gpus]
+    if (
+        len(gpus) < num_workers
+        or len(set(gpus)) != len(gpus)
+        or any(not re.fullmatch(r"[0-9]+|GPU-[\w-]+|MIG-[\w/-]+", gpu) for gpu in gpus)
+    ):
+        raise ValueError(
+            "parallel scoring requires CUDA_VISIBLE_DEVICES to list at least "
+            f"{num_workers} distinct GPU ordinals or UUIDs (got {visible!r})"
+        )
+    return gpus[:num_workers]
+
+
+@contextlib.contextmanager
+def _scoring_state(gpus):
+    """Keep GPU leases and candidate accounting shared across CompileIQ's native processes."""
+    counts = {"n": 0, "valid": 0, "timeout": 0}
+    if not gpus:
+        yield None, counts, threading.Lock()
+        return
+    with multiprocessing.Manager() as manager:
+        available = manager.Queue()
+        for gpu in gpus:
+            available.put(gpu)
+        yield available, manager.dict(counts), manager.Lock()
+
+
+class _CandidateScorer:
+    """A serializable objective; each GPU lease covers the entire scorer subprocess lifetime."""
+
+    def __init__(self, command, task_timeout, available, counts, lock, invalid_score, metric="ms"):
+        self.command = command
+        self.metric = metric
+        self.task_timeout = task_timeout
+        self.available = available
+        self.counts = counts
+        self.lock = lock
+        self.invalid_score = invalid_score
+
+    def __call__(self, acf, *args, **kwargs):
+        acf_hex = str(acf)
+        gpu = self.available.get() if self.available is not None else None
+        path = None
+        timed_out = False
+        score = None
+        try:
+            fd, path = tempfile.mkstemp(suffix=".acf")
+            with os.fdopen(fd, "wb") as f:
+                f.write(bytes.fromhex(acf_hex))
+            env = None if gpu is None else {**os.environ, "CUDA_VISIBLE_DEVICES": gpu}
+            # Pin only the child environment, before it imports CUDA. Never mutate the worker's env.
+            # subprocess.run kills and reaps a timed-out scorer before the GPU lease is returned.
+            out = subprocess.run(
+                [*self.command, "--acf", path],
+                env=env,
+                capture_output=True,
+                text=True,
+                timeout=self.task_timeout,
+                check=False,
+            )
+            last = out.stdout.strip().splitlines()[-1] if out.stdout.strip() else ""
+            if out.returncode == 0 and last.startswith(f"{self.metric.upper()} "):
+                value = float(last.split()[1])
+                if math.isfinite(value) and value >= 0 and (self.metric != "spill_bytes" or value.is_integer()):
+                    score = value
+        except subprocess.TimeoutExpired:
+            timed_out = True
+        except (OSError, ValueError, IndexError) as e:
+            print(f"[candidate] {type(e).__name__}: {e}", file=sys.stderr, flush=True)
+        finally:
+            try:
+                if path is not None:
+                    os.unlink(path)
+            finally:
+                if gpu is not None:
+                    self.available.put(gpu)
+        ok = score is not None
+        with self.lock:
+            self.counts["n"] += 1
+            self.counts["valid"] += int(ok)
+            self.counts["timeout"] += int(timed_out)
+            print(
+                json.dumps(
+                    {
+                        "kind": "candidate",
+                        "index": self.counts["n"],
+                        self.metric: score,
+                        "ok": ok,
+                        "timeout": timed_out,
+                        "gpu": gpu,
+                        "acf": acf_hex[:16],
+                    }
+                ),
+                file=sys.stderr,
+                flush=True,
+            )
+        return score if ok else self.invalid_score
 
 
 def _benchmark_mode(clock_mhz: int | None):
@@ -227,11 +338,18 @@ def main() -> int:
     warmup = os.environ.get("PTX_ANNEAL_WARMUP", "25")
     rep = os.environ.get("PTX_ANNEAL_REP", "50")
     gens = int(os.environ.get("CIQ_GENERATIONS", "1"))
-    pool = int(os.environ.get("CIQ_POOL", "0"))
+    pool = int(os.environ.get("CIQ_POOL", "8"))
     if pool == 0:
         pool = None
+    cull = int(os.environ.get("CIQ_CULL", "4"))
     task_timeout = _env_num("CIQ_TASK_TIMEOUT", float)
     clock_mhz = _env_num("CIQ_CLOCK_MHZ", int) if metric == "ms" else None
+    try:
+        num_workers = _env_num("PTX_ANNEAL_NUM_WORKERS", int)
+        num_workers = 1 if num_workers is None else num_workers
+        gpus = _worker_gpus(num_workers)
+    except ValueError as e:
+        raise SystemExit(f"compileiq_adapter: {e}") from e
 
     from compileiq.ciq import Search
     from compileiq.types import INVALID_SCORE, SearchConfiguration
@@ -254,98 +372,47 @@ def main() -> int:
         flush=True,
     )
 
-    seen = {"n": 0, "valid": 0, "timeout": 0}
+    command = [
+        *score_cmd,
+        "--task",
+        task,
+        "--ptxas",
+        ptxas,
+    ]
+    if metric == "ms":
+        command.extend(["--warmup", str(warmup), "--rep", str(rep)])
+    print(f"scoring: native workers={num_workers}; gpus={gpus or 'default CUDA device'}", file=sys.stderr, flush=True)
+    with _scoring_state(gpus) as (available, seen, lock):
+        objective = _CandidateScorer(command, task_timeout, available, seen, lock, INVALID_SCORE, metric)
+        cfg = SearchConfiguration(problem_type="min", generations=gens, pool_size=pool, cull_size=cull)
+        # Preserve all-invalid results and their provenance instead of crashing on the first batch.
+        search_kwargs = {}
+        if gpus:
+            from compileiq.types import WorkerTypes
 
-    def objective(acf, *args, **kwargs):
-        acf_hex = acf if isinstance(acf, str) else str(acf)
-        fd, path = tempfile.mkstemp(suffix=".acf")
-        timed_out = False
-        try:
-            with os.fdopen(fd, "wb") as f:
-                f.write(bytes.fromhex(acf_hex))
-            cmd = [
-                *score_cmd,
-                "--task",
-                task,
-                "--acf",
-                path,
-                "--ptxas",
-                ptxas,
-            ]
-            if metric == "ms":
-                cmd.extend(["--warmup", str(warmup), "--rep", str(rep)])
-            try:
-                # THE scorer must be bounded here, by us. The engine's own `task_timeout` bounds its
-                # worker, not our grandchild process -- so without this a candidate whose kernel hangs
-                # (an applied ACF can produce SASS that never returns) survives the engine giving up
-                # on it, keeps the GPU busy, and makes every LATER candidate slow enough to time out
-                # too. That death spiral is silent: the search just reports everything invalid.
-                out = subprocess.run(cmd, capture_output=True, text=True, timeout=task_timeout, check=False)
-            except subprocess.TimeoutExpired:
-                # subprocess.run has already killed the child by the time this is raised.
-                timed_out = True
-                out = None
-        finally:
-            os.unlink(path)
-        seen["n"] += 1
-        if timed_out:
-            seen["timeout"] += 1
-        last = "" if out is None or not out.stdout.strip() else out.stdout.strip().splitlines()[-1]
-        score = None
-        if out is not None and out.returncode == 0 and last.startswith(f"{metric.upper()} "):
-            try:
-                score = float(last.split()[1])
-            except (ValueError, IndexError):
-                score = None
-        ok = score is not None and math.isfinite(score) and score >= 0
-        if metric == "spill_bytes" and ok:
-            ok = score.is_integer()
-        if ok:
-            seen["valid"] += 1
-        print(
-            json.dumps(
-                {
-                    "kind": "candidate",
-                    "index": seen["n"],
-                    metric: score if ok else None,
-                    "ok": ok,
-                    "timeout": timed_out,
-                    "acf": acf_hex[:16],
-                }
-            ),
-            file=sys.stderr,
-            flush=True,
+            search_kwargs["worker_type"] = WorkerTypes.NATIVE
+        search = Search(
+            objective_function=objective,
+            search_space=search_space,
+            search_config=cfg,
+            exit_on_failure=False,
+            **search_kwargs,
         )
-        return score if ok else INVALID_SCORE
-
-    cfg = SearchConfiguration(problem_type="min", generations=gens, pool_size=pool)
-    # exit_on_failure=False: by default the engine raises if EVERY candidate fails in the first
-    # generation. For us that is not an error, it is the single most important verdict there is --
-    # "this kernel survives no ACF at all". Letting it raise loses the candidate counts, the search
-    # space, the budget and the fingerprint, i.e. exactly the evidence that makes the result
-    # attributable. Report it; do not crash on it.
-    search = Search(
-        objective_function=objective,
-        search_space=search_space,
-        search_config=cfg,
-        exit_on_failure=False,
-    )
-    # The engine's task_timeout is the OUTER backstop; the per-candidate kill above is the authority.
-    # Give the engine a grace margin so it does not preempt us at the same instant -- we want the
-    # candidate recorded as a clean INVALID (with its child reaped), not abandoned mid-flight.
-    start_kwargs = {} if task_timeout is None else {"task_timeout": task_timeout + _TIMEOUT_GRACE_S}
-    engine_error = None
-    result = None
-    try:
-        with _benchmark_mode(clock_mhz):
-            result = search.start(**start_kwargs)
-    except RuntimeError as e:
-        # Belt-and-braces behind exit_on_failure=False. An engine that dies mid-search must still
-        # yield a reportable outcome: we already know how many candidates ran, how many were valid
-        # and how many timed out, and throwing that away turns an informative red into an
-        # unattributable one. Recorded, not swallowed -- the message travels in the payload.
-        engine_error = f"{type(e).__name__}: {e}"
-        print(f"engine error (results below are partial): {engine_error}", file=sys.stderr, flush=True)
+        # Our scorer timeout kills the child before releasing its GPU. The engine gets a grace
+        # margin so it does not abandon the objective while we are still reaping that child.
+        start_kwargs = {} if task_timeout is None else {"task_timeout": task_timeout + _TIMEOUT_GRACE_S}
+        if gpus:
+            start_kwargs["num_workers"] = num_workers
+        engine_error = None
+        result = None
+        try:
+            with _benchmark_mode(clock_mhz):
+                result = search.start(**start_kwargs)
+        except RuntimeError as e:
+            engine_error = f"{type(e).__name__}: {e}"
+            print(f"engine error (results below are partial): {engine_error}", file=sys.stderr, flush=True)
+        # Snapshot before shutting down the manager; child-process counts must survive the search.
+        seen = dict(seen)
 
     df = result.get_results() if result is not None else None
     evaluated = len(df) if df is not None else seen["n"]
@@ -372,8 +439,11 @@ def main() -> int:
         # a property of the search problem and belongs in the fingerprint rather than being silently
         # absent from it.
         "budget": {
+            "num_workers": num_workers,
+            "gpus": gpus,
             "generations": gens,
             "pool_size": pool,
+            "cull_size": cull,
             "task_timeout": task_timeout,
             "clock_mhz": clock_mhz,
             "warmup": int(warmup) if metric == "ms" else None,

@@ -6,21 +6,24 @@
 import json
 import shutil
 import subprocess
-from datetime import datetime, timezone
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 
 from ptx_anneal import cli, task
+from ptx_anneal.store import LocalStore
+from ptx_anneal.target.ptx import ptx_ir_hash
 
 SAMPLE_TASK = Path(__file__).resolve().parents[1] / "sample_tasks" / "sample_task"
-REMOTE = "manifold://bucket/tree/task"
-DESTINATION = "bucket/tree/task/compileiq_20261014123456"
+REMOTE = "manifold://bucket/tree/run/tasks/task"
+DESTINATION = "bucket/tree/run/store"
 
 
 @pytest.fixture
 def tuning(monkeypatch, tmp_path):
+    sample = task.load(SAMPLE_TASK)
+    ir_hash = ptx_ir_hash(sample.ir)
     state = SimpleNamespace(
         calls=[],
         uploads={},
@@ -35,13 +38,10 @@ def tuning(monkeypatch, tmp_path):
             "search_space": {"resolved_tag": "test-catalog", "sha256": "abcd", "variant": "default", "source": "test"},
         },
         store=tmp_path / "store",
+        arch=sample.arch,
+        ir_hash=ir_hash,
+        remote_dir=f"{DESTINATION}/{sample.arch}/{ir_hash[:16]}",
     )
-
-    def now(tz):
-        assert tz is timezone.utc
-        return datetime(2026, 10, 14, 12, 34, 56, tzinfo=tz)
-
-    monkeypatch.setattr(task, "datetime", SimpleNamespace(now=now))
     monkeypatch.setattr(task.shutil, "which", lambda name: "/tools/manifold" if name == "manifold" else None)
     monkeypatch.setattr(cli, "_require_ptxas", lambda args: ("/ptxas", "13.3"))
     monkeypatch.setattr(cli, "_score_one", lambda *args: 1.0)
@@ -65,10 +65,11 @@ def tuning(monkeypatch, tmp_path):
             if operation == "get":
                 shutil.copyfile(SAMPLE_TASK / Path(argv[2]).name, argv[3])
             elif operation == "mkdir":
-                assert argv == ["/tools/manifold", "mkdir", DESTINATION]
+                assert argv == ["/tools/manifold", "mkdir", "-p", state.remote_dir]
             elif operation == "put":
                 assert kwargs["check"] is False
-                state.uploads[argv[3]] = Path(argv[2]).read_bytes()
+                assert argv[:3] == ["/tools/manifold", "put", "--overwrite"]
+                state.uploads[argv[-1]] = Path(argv[-2]).read_bytes()
             else:
                 pytest.fail(f"unexpected Manifold command: {argv}")
         return SimpleNamespace(returncode=0, stderr="", stdout="")
@@ -78,18 +79,59 @@ def tuning(monkeypatch, tmp_path):
 
 
 @pytest.mark.parametrize("source", [REMOTE, REMOTE + "/"])
-def test_tuning_uploads_acf_and_provenance_to_original_task(tuning, source, capsys):
+def test_tuning_uploads_store_directly_under_run_store(tuning, source, capsys):
     assert cli.main(["--task", source, "--output", str(tuning.store), "--upload-manifold"]) == 0
     acf = next(tuning.store.rglob("*.acf"))
-    remote_acf = f"{DESTINATION}/{acf.name}"
+    assert acf.parent == tuning.store / "sm_100a" / acf.name.split(".", 1)[0]
+    assert acf.name == f"{tuning.ir_hash[:16]}.13.3.acf"
+    remote_acf = f"{DESTINATION}/{acf.relative_to(tuning.store).as_posix()}"
     assert tuning.uploads[remote_acf] == acf.read_bytes() == bytes.fromhex("00abff")
     assert tuning.uploads[remote_acf + ".json"] == Path(str(acf) + ".json").read_bytes()
     meta = json.loads(tuning.uploads[remote_acf + ".json"])
     assert meta["ptxas_version"] == "13.3"
+    assert meta["ir_hash"] == tuning.ir_hash
     assert meta["engine_info"] == tuning.result["engine_info"]
     assert meta["search_space"] == tuning.result["search_space"]
     assert len(tuning.uploads) == 2
-    assert f"uploaded ACF and provenance -> manifold://{remote_acf}" in capsys.readouterr().out
+    assert all(path.startswith(f"{DESTINATION}/sm_100a/{tuning.ir_hash[:16]}/") for path in tuning.uploads)
+    assert f"uploaded task store -> manifold://{DESTINATION}" in capsys.readouterr().out
+
+
+@pytest.mark.parametrize("suffix", ["", "/"])
+def test_manifold_store_url_matches_requested_layout(suffix):
+    run = "tc_bench_ci/tree/magnon/aps-aps-v5_combo_inductorfix3_0910-0911-row9_dpp_dcb0-36ec92e9dd4c"
+    assert task.manifold_store_url(f"manifold://{run}/tasks/1e359f0358047d9e{suffix}") == f"manifold://{run}/store"
+
+
+def test_upload_includes_task_versions_and_cubin_but_not_other_kernels(tuning):
+    store = LocalStore(str(tuning.store))
+    previous = store.write("ptx", tuning.arch, tuning.ir_hash, b"previous-version", toolchain_version="13.4")
+    cubin = store.write_cubin(tuning.arch, tuning.ir_hash, "13.4", b"cached-cubin")
+    store.write("ptx", tuning.arch, "other-hash", b"unrelated", toolchain_version="13.3")
+    Path(previous + ".tmp.123").write_bytes(b"partial-write")
+    assert cli.main(["--task", REMOTE, "--output", str(tuning.store), "--upload-manifold"]) == 0
+    assert tuning.uploads[f"{DESTINATION}/{Path(previous).relative_to(tuning.store).as_posix()}"] == b"previous-version"
+    assert tuning.uploads[f"{DESTINATION}/{Path(cubin).relative_to(tuning.store).as_posix()}"] == b"cached-cubin"
+    assert len(tuning.uploads) == 5  # Two ACF/sidecar pairs and the optional cubin.
+    assert all(path.startswith(tuning.remote_dir + "/") for path in tuning.uploads)
+    assert not any(".tmp." in path or "other-hash" in path for path in tuning.uploads)
+
+
+def test_repeated_upload_refreshes_same_store_directory(tuning):
+    argv = ["--task", REMOTE, "--output", str(tuning.store), "--upload-manifold"]
+    assert cli.main(argv) == 0
+    tuning.result["acf"] = "aabbcc"
+    assert cli.main(argv) == 0
+    assert len(tuning.uploads) == 2
+    acf_data = next(data for path, data in tuning.uploads.items() if path.endswith(".acf"))
+    assert acf_data == bytes.fromhex("aabbcc")
+
+
+def test_upload_requires_a_loadable_remote_task_directory(tuning):
+    tuning.fail = "get"
+    assert cli.main(["--task", REMOTE, "--upload-manifold"]) == 1
+    assert not tuning.uploads
+    assert all(argv[:2] == ["/tools/manifold", "get"] for argv in tuning.calls)
 
 
 @pytest.mark.parametrize("outcome", ["slower", "invalid", "no_baseline"])
@@ -131,7 +173,7 @@ def test_upload_failure_is_nonzero_and_keeps_local_result(tuning, capsys, failur
     assert Path(str(acf) + ".json").is_file()
     captured = capsys.readouterr()
     assert f"Local ACF retained at {acf}" in captured.err
-    assert "uploaded ACF and provenance" not in captured.out
+    assert "uploaded task store" not in captured.out
     assert "test-fingerprint" in captured.out
     if failure == "mkdir":
         assert not any(argv[1] == "put" for argv in tuning.calls)
@@ -146,6 +188,26 @@ def test_upload_rejects_non_manifold_tasks_before_io(tuning, source, capsys):
     assert tuning.calls == []
 
 
+@pytest.mark.parametrize(
+    "source",
+    [
+        REMOTE + "/spec.json",
+        REMOTE + "/kernel.ptx",
+        REMOTE + "?query=yes",
+        REMOTE + "#fragment",
+        "manifold://bucket/tree/run/task",
+        "manifold://bucket/tree/run/tasks/../task",
+        "manifold://bucket/tree/run//tasks/task",
+        "manifold://bucket",
+    ],
+)
+def test_upload_rejects_invalid_task_directory_layout_before_io(tuning, source):
+    with pytest.raises(SystemExit) as error:
+        cli.main(["--task", source, "--upload-manifold"])
+    assert error.value.code == 2
+    assert tuning.calls == []
+
+
 @pytest.mark.parametrize("command", ["replay", "doctor", "_score"])
 def test_non_tuning_commands_reject_upload_option(tuning, command):
     args = [] if command == "doctor" else ["--task", REMOTE]
@@ -156,8 +218,9 @@ def test_non_tuning_commands_reject_upload_option(tuning, command):
 
 
 def test_missing_provenance_fails_before_remote_writes(tuning, tmp_path):
-    acf = tmp_path / "test.acf"
+    acf = tmp_path / tuning.arch / tuning.ir_hash / f"{tuning.ir_hash}.13.3.acf"
+    acf.parent.mkdir(parents=True)
     acf.write_bytes(b"acf")
     with pytest.raises(task.TaskError, match="missing local file"):
-        task.upload_acf(REMOTE, str(acf))
+        task.upload_store(REMOTE, str(tmp_path), str(acf))
     assert tuning.calls == []
