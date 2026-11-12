@@ -21,8 +21,10 @@ lives in a directory containing exactly two files:
       "grid":   [8, 1, 1],               # launch grid (CTAs)
       "ptxas":  "",                      # ptxas path (filled at run; never hardcode)
       "tensors": [{"shape", "dtype", "strides"}, ...],
-      "args":    [{"t": i} | {"i32"|"i64"|"f32": v} | {"tma": j} | {"null": true}, ...],
+      "args":    [{"t": i} | {"i32"|"i64"|"f32": v} | {"tma": j} | {"global_scratch": true}
+                  | {"null": true}, ...],
       "tensordescs": [...],              # optional; host-TMA descriptors
+      "global_scratch": {"size", "align"},   # optional; per-CTA bytes of global scratch
       "ir_hash": "<sha256>",             # content key; alias "ptx_sha256" (legacy)
       "kernel_name": "...", "fn_name": "..."   # provenance (optional)
     }
@@ -31,7 +33,8 @@ The store key is ``(target, arch, ir_hash)``. For the ``ptx`` target ``ir_hash``
 ``sha256`` of the normalized PTX (see :mod:`ptx_anneal.target.ptx`), so one artifact
 transfers across runtime shapes of the same kernel. ``"args"`` is the final
 kernel-param order (post constexpr / ``equal_to_1`` specialization), including the two
-trailing null scratch params.
+trailing scratch params: ``global_scratch`` (null, or ``{"global_scratch": true}`` for a
+``grid_size * global_scratch.size`` byte buffer) then ``profile_scratch`` (always null).
 
 The loader accepts specs that omit ``spec_version`` (treated as v1) so tasks already
 collected by older frontends keep working.
