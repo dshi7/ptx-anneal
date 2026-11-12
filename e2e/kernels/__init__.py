@@ -109,3 +109,5 @@ _load("addmm_2cta")
 _load("synth_acf")
 # pt2: the torch.compile use cases -- an Inductor-generated kernel and a user-defined one.
 _load("pt2")
+# inplace_acc: y += f(x); proves the consume A/B never writes to the caller's buffers.
+_load("inplace_acc")
