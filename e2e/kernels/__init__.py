@@ -107,3 +107,5 @@ _load("fa_family")
 _load("addmm_2cta")
 # synth_acf: register-spilling synthetic kernel -- real ptxas-ACF headroom + a fidelity probe.
 _load("synth_acf")
+# pt2: the torch.compile use cases -- an Inductor-generated kernel and a user-defined one.
+_load("pt2")

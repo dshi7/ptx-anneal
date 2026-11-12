@@ -23,7 +23,12 @@ TASK=../sample_tasks/<name> ./e2e.sh       # a different captured task
 CIQ_SS_TAG=search-spaces-YYYY.MM.DD ./e2e.sh   # pin the search-space catalog (reproducible)
 MODE=full ./e2e.sh                         # 3-step collect -> factory -> consume (synth_acf)
 MODE=full ./e2e.sh synth_acf ws_gemm       # ... on specific registered kernels
+MODE=full ./e2e.sh pt2_inductor pt2_user_defined synth_acf   # one kernel per use case
 ```
+
+The three use cases each have a kernel: `pt2_inductor` (an Inductor-generated kernel),
+`pt2_user_defined` (a `@triton.jit` kernel inside `torch.compile`) and `synth_acf` (a standalone
+launch). Both PT2 kernels reach Triton through `CompiledKernel.run`, not `JITFunction.run`.
 
 `MODE=tune` (default) runs the **factory only** — search → score → admit; no frontend, no
 collect/consume. With `compileiq` installed it needs no arguments at all: `ptxas` is discovered
