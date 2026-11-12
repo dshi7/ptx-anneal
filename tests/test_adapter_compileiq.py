@@ -203,16 +203,18 @@ def test_engine_info_identifies_the_engine(fake_compileiq):
     assert info["version"]  # "unknown" when metadata is unavailable, never missing
 
 
-def test_task_timeout_and_clock_are_off_by_default(fake_compileiq, monkeypatch):
-    """The doc-conformance knobs must not change the shipped torch-free path unless asked for.
+def test_task_timeout_on_and_clock_off_by_default(fake_compileiq, monkeypatch):
+    """A hung candidate must not stall the search, so the timeout is on unless disabled with 0.
 
-    Unset means *absent*, not zero: ``start()`` keeps the engine's own default, and the GPU clocks
-    are not touched at all (``gpu_benchmark_mode(None)`` would warn, or raise).
+    The clock knob stays off: unset means *absent*, so the GPU clocks are not touched at all
+    (``gpu_benchmark_mode(None)`` would warn, or raise).
     """
     mod = _load_adapter()
     for var in ("CIQ_TASK_TIMEOUT", "CIQ_CLOCK_MHZ"):
         monkeypatch.delenv(var, raising=False)
-    assert mod._env_num("CIQ_TASK_TIMEOUT", float) is None
+    assert mod._task_timeout() == mod.DEFAULT_TASK_TIMEOUT_S
+    monkeypatch.setenv("CIQ_TASK_TIMEOUT", "0")
+    assert mod._task_timeout() is None
     assert mod._env_num("CIQ_CLOCK_MHZ", int) is None
     # nullcontext, not the engine's clock manager -- and reached without importing compileiq.utils.
     with mod._benchmark_mode(None):
@@ -223,7 +225,7 @@ def test_task_timeout_and_clock_are_read_when_set(fake_compileiq, monkeypatch):
     mod = _load_adapter()
     monkeypatch.setenv("CIQ_TASK_TIMEOUT", "20")
     monkeypatch.setenv("CIQ_CLOCK_MHZ", "1965")
-    assert mod._env_num("CIQ_TASK_TIMEOUT", float) == 20.0
+    assert mod._task_timeout() == 20.0
     assert mod._env_num("CIQ_CLOCK_MHZ", int) == 1965
 
 

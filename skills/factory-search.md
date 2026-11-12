@@ -134,8 +134,8 @@ Mind which of the two tuning paths you are reasoning about (see `AGENTS.md`):
   is reaped and scored `INVALID`.
 - **`ptx-anneal --task` (the CLI, what ships).** Each candidate is still scored in a
   separate `_score` subprocess, and any exception there is caught and reported as
-  `INVALID`. Set `CIQ_TASK_TIMEOUT` to bound each search candidate's scorer subprocess;
-  the default has no timeout. A timed-out scorer is killed and reaped before its GPU
+  `INVALID`. `CIQ_TASK_TIMEOUT` bounds each search candidate's scorer subprocess
+  (default 120 s; `0` disables it). A timed-out scorer is killed and reaped before its GPU
   lease is returned to other workers. The initial baseline and the final winner check
   run in-process and are not covered by this search-candidate timeout.
   Correctness is checked before timing in both paths.

@@ -18,7 +18,7 @@ Contract (all via env, set by the harness):
     PTX_ANNEAL_NUM_WORKERS              native workers (default 1); multiple workers require
                                         an explicit CUDA_VISIBLE_DEVICES list, one GPU per worker
     CIQ_GENERATIONS / CIQ_POOL / CIQ_CULL engine budget (defaults 1 / 8 / 4)
-    CIQ_TASK_TIMEOUT                     per-candidate timeout, seconds (optional; unset = no timeout)
+    CIQ_TASK_TIMEOUT                     per-candidate timeout, seconds (default 120; 0 = no timeout)
     CIQ_CLOCK_MHZ / CIQ_CLOCK_SUDO       lock GPU clocks around the search (optional; unset = don't touch)
     CIQ_SS_VERSION / CIQ_SS_VARIANT / CIQ_SS_TAG   catalog selector, when PTX_ANNEAL_SS is unset
 
@@ -31,8 +31,9 @@ null) to PTX_ANNEAL_RESULT. Spill tuning uses "best_spill_bytes" in place of "be
 put it in a search-problem fingerprint. Two channels driving this same adapter are only comparable
 if their budgets are equal, and "equal" has to be observed rather than assumed.
 
-The timeout and clock knobs default to OFF so the shipped torch-free path behaves exactly as before.
-They exist because NVIDIA's documented example uses both (``start(task_timeout=20)`` and
+The per-candidate timeout is ON by default: an applied ACF can make a kernel hang, and an unbounded
+hang stalls the whole search. The clock knob defaults to OFF. Both exist because NVIDIA's
+documented example uses both (``start(task_timeout=20)`` and
 ``gpu_benchmark_mode(clock_mhz=...)``, which their doc calls crucial), and "we followed your doc" is
 what makes a CompileIQ bug report credible -- so a channel that wants to conform can, through a
 recorded knob rather than a fork.
@@ -57,6 +58,10 @@ import sys
 import tempfile
 import threading
 
+# Long enough for a valid candidate of a large kernel (seconds), short enough that a wedged one
+# does not stall the search. Matches the triton-native runway's per-candidate bound.
+DEFAULT_TASK_TIMEOUT_S = 120.0
+
 # Slack between our per-candidate kill and the engine's own task_timeout, so the two cannot fire at
 # the same moment and leave a candidate abandoned rather than cleanly recorded as invalid.
 _TIMEOUT_GRACE_S = 5
@@ -66,6 +71,14 @@ def _env_num(name: str, cast):
     """Read an optional numeric knob. Unset or empty means "not requested", not "zero"."""
     raw = os.environ.get(name, "").strip()
     return cast(raw) if raw else None
+
+
+def _task_timeout() -> float | None:
+    """Per-candidate timeout: CIQ_TASK_TIMEOUT seconds, the default when unset, None (off) when <= 0."""
+    value = _env_num("CIQ_TASK_TIMEOUT", float)
+    if value is None:
+        return DEFAULT_TASK_TIMEOUT_S
+    return value if value > 0 else None
 
 
 def _worker_gpus(num_workers: int) -> list[str]:
@@ -342,7 +355,7 @@ def main() -> int:
     if pool == 0:
         pool = None
     cull = int(os.environ.get("CIQ_CULL", "4"))
-    task_timeout = _env_num("CIQ_TASK_TIMEOUT", float)
+    task_timeout = _task_timeout()
     clock_mhz = _env_num("CIQ_CLOCK_MHZ", int) if metric == "ms" else None
     try:
         num_workers = _env_num("PTX_ANNEAL_NUM_WORKERS", int)
