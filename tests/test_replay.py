@@ -77,6 +77,9 @@ def test_replay_launches_spec_without_acf(monkeypatch, bench):
     monkeypatch.setattr(L, "alloc_tensors", Mock(return_value=tensors))
     maps = Mock(return_value=(descriptors, addresses))
     monkeypatch.setattr(L, "build_tensormaps", maps)
+    scratch = object()
+    alloc_scratch = Mock(return_value=scratch)
+    monkeypatch.setattr(L, "alloc_global_scratch", alloc_scratch)
     make_args = Mock(return_value=args)
     monkeypatch.setattr(L, "kernel_args_from_spec", make_args)
 
@@ -91,7 +94,8 @@ def test_replay_launches_spec_without_acf(monkeypatch, bench):
     compile_ptx.assert_called_once_with("PTX", "/ptxas", arch="sm_100a")
     load.assert_called_once_with(b"cubin", "k", 100, cluster=[2, 1, 1])
     maps.assert_called_once_with(spec, tensors)
-    make_args.assert_called_once_with(spec, tensors, addresses)
+    alloc_scratch.assert_called_once_with(spec)
+    make_args.assert_called_once_with(spec, tensors, addresses, scratch)
     kernel.unload.assert_called_once()
 
     def failed_measure(*a, **kw):

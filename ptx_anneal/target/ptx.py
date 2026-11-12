@@ -117,11 +117,12 @@ class PtxTarget(base.Target):
             try:
                 tensors = L.alloc_tensors(spec, seed=0)
                 tms, addrs = L.build_tensormaps(spec, tensors)  # [] for non-TMA kernels
-                ka = L.kernel_args_from_spec(spec, tensors, addrs)
+                scratch = L.alloc_global_scratch(spec)  # None unless the kernel uses global scratch
+                ka = L.kernel_args_from_spec(spec, tensors, addrs, scratch)
                 torch.cuda.synchronize()  # finish input initialization before the driver launch
                 k.launch(spec["grid"], spec["block"], ka)
                 torch.cuda.synchronize()
-                return k, tensors, ka, tms
+                return k, tensors, ka, (tms, scratch)
             except Exception:
                 k.unload()
                 raise
@@ -131,7 +132,8 @@ class PtxTarget(base.Target):
             baseline, ref, _, _tms0 = run_and_snapshot(None)
             baseline.unload()
             # 2) candidate run (with the ACF, or baseline again when artifact_path is None). Keep `tms`
-            #    alive: the TMA descriptors it holds are referenced by `ka` for the benchmark below.
+            #    alive: the TMA descriptors and global scratch it holds are referenced by `ka` for the
+            #    benchmark below.
             k, tensors, ka, tms = run_and_snapshot(artifact_path)
             try:
                 # 3) compare every buffer against independent untuned execution, including BF16.

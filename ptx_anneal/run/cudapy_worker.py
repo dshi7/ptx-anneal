@@ -67,6 +67,19 @@ def _host_inputs(spec, seed=0):
     return arrs
 
 
+def _alloc_global_scratch(spec):
+    """(allocation, aligned address) of a zeroed grid_size * size byte buffer, or None when the
+    kernel uses no global scratch (see ptx_launch.alloc_global_scratch)."""
+    gs = spec.get("global_scratch")
+    if not gs:
+        return None
+    gx, gy, gz = spec["grid"]
+    size, align = gx * gy * gz * int(gs["size"]), int(gs["align"])
+    p = _chk(d.cuMemAlloc(size + align))
+    _chk(d.cuMemsetD8(p, 0, size + align))
+    return p, int(p) + (-int(p) % align)
+
+
 def _launch_and_snapshot(ptx, spec, ptxas, acf_path, host_inputs):
     """ptxas(ptx[,acf]) -> cubin -> alloc+HtoD -> launch -> sync -> DtoH all buffers. Returns
     (loaded_kernel, kernel_args, device_ptrs, [np output arrays]). Caller frees device_ptrs."""
@@ -77,11 +90,14 @@ def _launch_and_snapshot(ptx, spec, ptxas, acf_path, host_inputs):
         p = _chk(d.cuMemAlloc(h.nbytes))
         _chk(d.cuMemcpyHtoD(p, h.ctypes.data, h.nbytes))
         ptrs.append(p)
+    scratch = _alloc_global_scratch(spec)
     # Build launch args from the spec's final arg order using our device pointers.
     ka = []
     for a in spec["args"]:
         if "t" in a:
             ka.append(("ptr", int(ptrs[a["t"]])))
+        elif a.get("global_scratch"):
+            ka.append(("ptr", scratch[1]))
         elif a.get("null"):
             ka.append(("null",))
         elif "i32" in a:
@@ -99,6 +115,8 @@ def _launch_and_snapshot(ptx, spec, ptxas, acf_path, host_inputs):
         out = np.empty_like(h)
         _chk(d.cuMemcpyDtoH(out.ctypes.data, p, h.nbytes))
         snaps.append(out)
+    if scratch is not None:
+        ptrs.append(scratch[0])  # freed with the tensors, after the benchmark that reuses `ka`
     return k, ka, ptrs, snaps
 
 

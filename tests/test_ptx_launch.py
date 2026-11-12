@@ -8,7 +8,13 @@ from types import SimpleNamespace
 
 import pytest
 
-from ptx_anneal.ptx_launch import _build_kernel_params, _pick_n, build_spec, build_spec_from_schema
+from ptx_anneal.ptx_launch import (
+    _build_kernel_params,
+    _pick_n,
+    build_spec,
+    build_spec_from_schema,
+    kernel_args_from_spec,
+)
 
 
 # --- CUDA-graph unroll count (auto-N) -----------------------------------------------------------
@@ -112,6 +118,44 @@ def test_build_spec_cluster_survives_json_roundtrip():
     assert json.loads(json.dumps(spec))["cluster"] == [2, 1, 1]
 
 
+# --- global scratch (device-side TMA descriptors etc.; no GPU) ----------------------------------
+def test_build_spec_records_global_scratch():
+    spec = build_spec(_PTX, _md(global_scratch_size=128, global_scratch_align=128), (4, 1, 1), _ARGS, "ptxas")
+    assert spec["global_scratch"] == {"size": 128, "align": 128}
+    assert spec["args"] == [{"t": 0}, {"global_scratch": True}, {"null": True}]
+
+
+def test_build_spec_no_global_scratch_key_when_unused():
+    spec = build_spec(_PTX, _md(), (4, 1, 1), _ARGS, "ptxas")
+    assert "global_scratch" not in spec
+    assert spec["args"][-2:] == [{"null": True}, {"null": True}]
+
+
+def test_build_spec_rejects_profile_scratch():
+    with pytest.raises(NotImplementedError):
+        build_spec(_PTX, _md(profile_scratch_size=64), (4, 1, 1), _ARGS, "ptxas")
+
+
+class _Buf:
+    def __init__(self, ptr):
+        self.ptr = ptr
+
+    def data_ptr(self):
+        return self.ptr
+
+
+def test_kernel_args_from_spec_passes_global_scratch_pointer():
+    spec = build_spec(_PTX, _md(global_scratch_size=128, global_scratch_align=128), (4, 1, 1), _ARGS, "ptxas")
+    ka = kernel_args_from_spec(spec, [_Buf(0x1000)], global_scratch=_Buf(0x2000))
+    assert ka == [("ptr", 0x1000), ("ptr", 0x2000), ("null",)]
+
+
+def test_kernel_args_from_spec_requires_global_scratch_buffer():
+    spec = build_spec(_PTX, _md(global_scratch_size=128, global_scratch_align=128), (4, 1, 1), _ARGS, "ptxas")
+    with pytest.raises(ValueError):
+        kernel_args_from_spec(spec, [_Buf(0x1000)])
+
+
 # --- build_spec_from_schema: Level 0 launch-metadata replaces PTX parsing (prototype) --------------
 # A PTX with one user scalar param (p1) between the user pointer (p0) and the two trailing scratch ptrs.
 _PTX_SCALAR = """//
@@ -175,6 +219,13 @@ def test_from_schema_matches_build_spec_with_scalar():
     got = build_spec_from_schema(schema, _PTX_SCALAR, (4, 1, 1), args, "ptxas")
     assert got == want
     assert got["args"] == [{"t": 0}, {"i32": 7}, {"null": True}, {"null": True}]
+
+
+def test_from_schema_matches_build_spec_global_scratch():
+    want = build_spec(_PTX, _md(global_scratch_size=128, global_scratch_align=128), (4, 1, 1), _ARGS, "ptxas")
+    schema = _schema(global_scratch_size=128, global_scratch_align=128)
+    got = build_spec_from_schema(schema, _PTX, (4, 1, 1), _ARGS, "ptxas")
+    assert got == want
 
 
 def test_from_schema_parity_mismatch_raises():

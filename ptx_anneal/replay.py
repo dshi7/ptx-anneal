@@ -30,7 +30,8 @@ def replay(task: Task, ptxas: str, *, warmup: int = 25, rep: int = 50, bench: st
         tensors = L.alloc_tensors(spec, seed=0)
         # Both the tensors and descriptor objects must outlive graph capture and its replays.
         tensormaps, addresses = L.build_tensormaps(spec, tensors)
-        args = L.kernel_args_from_spec(spec, tensors, addresses)
+        scratch = L.alloc_global_scratch(spec)
+        args = L.kernel_args_from_spec(spec, tensors, addresses, scratch)
         # The benchmark uses a nonblocking stream; finish torch's input initialization first.
         torch.cuda.synchronize()
         kernel.launch(spec["grid"], spec["block"], args)
